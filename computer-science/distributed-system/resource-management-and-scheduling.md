@@ -1,10 +1,10 @@
-# Resource Management
+# Gestion des Ressources
 
-## 集中式结构
+## Structure Centralisée
 
-一台或多台服务器组成中央服务器组，系统内所有的业务先由中央服务器处理。多个服务节点与中央服务器组相连，将自己的信息汇报给中央服务器。
+Un ou plusieurs serveurs forment un groupe de serveurs centralisés, où toutes les opérations du système sont d'abord traitées par le serveur central. Les différents nœuds de service sont connectés au groupe de serveurs centralisés et rapportent leurs informations au serveur central.
 
-优点：部署简单。
+Avantages : Déploiement simple.
 
 ![](../../.gitbook/assets/image%20%28274%29.png)
 
@@ -20,11 +20,10 @@
 
 ![](../../.gitbook/assets/image%20%28272%29.png)
 
-## 非集中式结构
+## Structure Décentralisée
 
-集中式结构存在单点性能瓶颈和单点故障等问题。非集中式可以做到超大规模。
+La structure centralisée présente des problèmes de goulot d'étranglement de performances et de pannes ponctuelles. Les structures décentralisées peuvent être mises à l'échelle de manière très importante.
 
-以 Akka、Redis、Cassandra 为例。
+Exemples avec Akka, Redis et Cassandra.
 
 ![](../../.gitbook/assets/image%20%28281%29.png)
-

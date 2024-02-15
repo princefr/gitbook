@@ -1,79 +1,78 @@
-# Data Link Layer
+# Couche liaison de données
 
-**数据链路层**（Data Link Layer）是 OSI 参考模型第二层。还可以细分成介质访问控制（MAC）子层和逻辑链路控制（LLC）子层。
+La **couche liaison de données** est la deuxième couche du modèle OSI. Elle peut être subdivisée en deux sous-couches : la sous-couche de contrôle d'accès au support (MAC) et la sous-couche de contrôle de liaison logique (LLC).
 
-介质访问控制（**M**edium **A**ccess **C**ontrol，**MAC**）子层专职处理介质访问的争用与冲突问题。是数据链路层的下层部分。
+La sous-couche de contrôle d'accès au support (**MAC**, pour *Medium Access Control*) gère exclusivement les problèmes de contention et de conflit d'accès au support. C'est la partie inférieure de la couche liaison de données.
 
-在物理层提到 Hub，它是把信号复制发送给所有的接口，所以需要解决以下三个问题：
+Lorsqu'on parle de hub dans la couche physique, il copie le signal et l'envoie à toutes les interfaces, donc il faut résoudre les trois problèmes suivants :
 
-* 谁应该接受这个数据包？
-* 多台机器同时发，冲突怎么解决？即**多路访问**问题。
-* 如果发送错误怎么解决？
+* Qui devrait recevoir ce paquet de données ?
+* Comment résoudre les conflits lorsque plusieurs machines envoient simultanément des données ? C'est le problème de l'accès multiple.
+* Comment résoudre les erreurs d'envoi ?
 
-解决多路访问问题的方式：
+Les méthodes pour résoudre le problème de l'accès multiple sont :
 
-* 信道划分。
-* 轮流协议。
-* 随机接入协议，比如以太网。
+* La division du canal.
+* Les protocoles de rotation.
+* Les protocoles d'accès aléatoire, comme Ethernet.
 
-![&#x7B2C;&#x4E8C;&#x5C42;&#x7F51;&#x7EDC;&#x5305;&#x683C;&#x5F0F;](../../.gitbook/assets/image%20%2866%29.png)
+![Format de la couche liaison de données](../../.gitbook/assets/image%20%2866%29.png)
 
-解决第一个问题就要靠网络包的目标 MAC 地址。
+Pour résoudre le premier problème, il faut se fier à l'adresse MAC de destination du paquet réseau.
 
-解决第三个问题靠网络包的 CRC，**循环冗余校验**（**Cyclic redundancy check**）。
+Pour résoudre le troisième problème, on utilise le CRC (Cyclic Redundancy Check), une technique de contrôle d'erreur qui utilise une somme de contrôle pour détecter les erreurs de transmission.
 
 ## ARP
 
-**地址解析协议**（**A**ddress **R**esolution **P**rotocol，缩写：**ARP**）是一个通过解析网络层地址来找寻数据链路层地址的网络传输协议，即通过 IP 地址找 MAC 地址。
+Le **protocole de résolution d'adresses** (**ARP**, pour *Address Resolution Protocol*) est un protocole de transmission de réseau qui permet de rechercher l'adresse de couche liaison de données (MAC) à partir de l'adresse de couche réseau (IP), c'est-à-dire de trouver l'adresse MAC à partir de l'adresse IP.
 
-通过发送一个广播，谁的 IP 符合条件，谁叫回复自己的 MAC 地址。
+En envoyant une diffusion, toute machine dont l'IP correspond répondra avec son adresse MAC.
 
-![](../../.gitbook/assets/image%20%2846%29.png)
+Pour éviter de devoir effectuer une requête ARP à chaque fois, les machines conservent également un cache ARP localement. Bien sûr, les machines peuvent se connecter et se déconnecter, et les adresses IP peuvent changer, donc le cache d'adresses MAC ARP expire après un certain temps.
 
-为了避免每次都用 ARP 请求，机器本地也会进行 ARP 缓存。当然机器会不断地上线下线，IP 也可能会变，所以 ARP 的 MAC 地址缓存过一段时间就会过期。
+## Commutateur
 
-## 交换机
+C'est un appareil de la couche 2.
 
-是二层设备。
+Lorsqu'un ordinateur MAC1 envoie un paquet à un autre ordinateur MAC2, lorsque ce paquet arrive au commutateur, celui-ci ne sait pas au départ où se trouve l'ordinateur MAC2. Il enverra donc le paquet à tous les ports sauf celui par lequel il est arrivé. Cependant, à ce moment-là, le commutateur se souviendra que MAC1 provient d'un port spécifique. Plus tard, si un paquet a une adresse de destination MAC1, il sera envoyé directement à ce port.
 
-一台 MAC1 电脑将一个包发送给另一台 MAC2 电脑，当这个包到达交换机的时候，一开始交换机也不知道MAC2 的电脑在哪个口，它只能将包转发给除了来的那个口之外的其他所有的口。但是，这个时候，交换机会会记住 MAC1 是来自一个明确的口。以后有包的目的地址是 MAC1 的，直接发送到这个口就可以了。
-
-当交换机作为一个关卡一样，过了一段时间之后，就有了整个网络的一个结构了，这个时候，基本上不用广播了，全部可以准确转发。当然，每个机器的 IP 地址会变，所在的口也会变，因而交换机上的学习的结果，我们称为**转发表**，是有一个过期时间的。
+Comme une porte de péage, après un certain temps, le réseau aura une structure complète, et à ce moment-là, il n'y aura pratiquement plus de diffusion. Tout peut être transmis avec précision. Bien sûr, chaque machine aura une adresse IP qui peut changer, et donc les résultats de l'apprentissage sur le commutateur, que nous appelons une **table de commutation**, ont une durée de vie.
 
 ## STP
 
-当机器越来越多，一台交换机不够，所以会出现越来越多的交换机，当交换机较多，连接复杂，就容易出现**环路问题**。
+Lorsque le nombre de machines augmente, un seul commutateur ne suffit pas, donc de plus en plus de commutateurs apparaîtront, et lorsque le réseau de connexion deviendra plus complexe, des problèmes de **boucles de commutation** pourront survenir.
 
-**生成树协议**（**Spanning Tree Protocol**，**STP**），是一种工作在OSI网络模型中的第二层\(数据链路层\)的通信协议，基本应用是防止交换机冗余链路产生的环路，用于确保以太网中无环路的逻辑拓扑结构，从而避免了广播风暴。
+Le **protocole d'arbre couvrant** (**STP**, pour *Spanning Tree Protocol*) est un protocole de communication de la couche 2 (couche liaison de données) du modèle OSI, dont l'application de base est d'empêcher les boucles de commutation redondantes, assurant ainsi qu'aucun réseau Ethernet n'a de boucles logiques et permettant d'éviter les tempêtes de diffusion.
 
-**工作原理**：任意一交换机中如果到达根网桥有两条或者两条以上的链路，生成树协议都根据算法把其中一条切断，仅保留一条，从而保证任意两个交换机之间只有一条单一的活动链路。
+**Principe de fonctionnement** : Dans chaque commutateur, si deux ou plusieurs chemins vers le commutateur racine sont disponibles, le protocole STP coupe l'un des chemins en fonction de l'algorithme, ne laissant qu'un seul chemin, garantissant ainsi qu'il n'y a qu'un seul chemin actif entre chaque paire de commutateurs.
 
-**工作过程**：首先进行根网桥的选举，其依据是网桥优先级（bridge priority）和 MAC 地址组合生成的桥 ID，桥 ID 最小的网桥将成为网络中的根桥（bridge root）。在此基础上，计算每个节点到根桥的距离，并由这些路径得到各冗余链路的代价，选择最小的成为通信路径（相应的端口状态变为 forwarding），其它的就成为备份路径\(相应的端口状态变为 blocking\)。STP 生成过程中的通信任务由 BPDU 完成，这种数据包又分为包含配置信息的配置 BPDU（其大小不超过35B）和包含拓扑变化信息的通知 BPDU（其长度不超过4B）。
+**Processus de fonctionnement** : Tout d'abord, l'élection du commutateur racine est effectuée, basée sur la priorité du commutateur (bridge priority) et l'ID de pont généré en combinaison avec l'adresse MAC. Le commutateur avec l'ID de pont le plus bas devient le commutateur racine dans le réseau. Sur cette base, les distances de chaque nœud au commutateur racine sont calculées, et les coûts des chemins redondants sont obtenus à partir de ces chemins, le chemin le plus court étant sélectionné comme chemin de communication (le port correspondant change d'état pour devenir *forwarding*), et les autres deviennent des chemins de secours (le port correspondant change d'état pour devenir *blocking*). Les tâches de communication du processus de génération STP sont effectuées par des BPDUs (Bridge Protocol Data Units), qui se divisent en BPDUs de configuration contenant des informations de configuration (leur taille ne dépasse pas 35 octets) et des BPDUs de notification contenant des informations de changement de topologie (leur taille ne dépasse pas 4 octets).
 
-* **Root Bridge**，也就是**根交换机**。
-* **Designated Bridges**，有的翻译为**指定交换机**。
-* **Bridge Protocol Data Units （BPDU）** ，**网桥协议数据单元**。
-* **Priority Vector**，**优先级向量**。
+* **Root Bridge**, ou **commut
+
+ateur racine**.
+* **Designated Bridges**, parfois traduit par **commutateurs désignés**.
+* **Bridge Protocol Data Units (BPDU)**, ou **unités de données de protocole de pont (BPDU)**.
+* **Priority Vector**, ou **vecteur de priorité**.
 
 ## VLAN
 
-交换机增多以后，还会出现广播问题和安全问题。
+Lorsque le nombre de commutateurs augmente, des problèmes de diffusion et de sécurité peuvent survenir.
 
-**虚拟局域网**（**Virtual Local Area Network，VLAN**,，**V-LAN**）是一种建构于局域网交换技术（LAN Switch）的网络管理的技术，网管人员可以借此透过控制交换机有效分派出入局域网的分组到正确的出入端口，达到对不同实体局域网中的设备进行逻辑分群（Grouping）管理，并**降低局域网内大量数据流通**时，因无用分组过多导致壅塞的问题，以及**提升局域网的信息安全保障**。
+Le **réseau local virtuel** (**VLAN**, pour *Virtual Local Area Network*) est une technologie de gestion de réseau construite sur la technologie de commutation LAN (LAN Switch), qui permet aux administrateurs réseau de contrôler efficacement le routage des paquets entrants et sortants du réseau local vers les ports d'entrée et de sortie appropriés, permettant de **regrouper logiquement les appareils dans différents réseaux locaux physiques**, ce qui réduit le nombre de paquets inutiles circulant dans le réseau local et **améliore la sécurité de l'information** du réseau local.
 
-![](../../.gitbook/assets/image%20%28143%29.png)
+![VLAN](../../.gitbook/assets/image%20%28143%29.png)
 
-在原来的二层的头上加一个 TAG，里面有一个 VLAN ID，一共12位。如果交换机是支持 VLAN 的，它会把二层的头取下来，识别 VLAN ID。只有相同 VLAN 的包，才会互相转发，不同 VLAN 的包，是看不到的。这样就能解决广播和安全问题。
+Un TAG est ajouté au-dessus de la couche 2 existante, contenant un ID VLAN sur 12 bits. Si un commutateur prend en charge les VLAN, il retirera l'en-tête de la couche 2 et identifiera l'ID VLAN. Seuls les paquets appartenant au même VLAN seront transmis entre eux, et les paquets de VLAN différents ne seront pas visibles. Cela permet de résoudre les problèmes de diffusion et de sécurité.
 
-可以设置交换机每个口所属的 VLAN。每个 VLAN 的口都是可以重新设置的。
+Vous pouvez configurer le VLAN auquel chaque port du commutateur appartient. Chaque port VLAN peut être réaffecté.
 
-交换机之间的连接靠 **Trunk** 口。它可以转发属于任何 VLAN 的口。
+Les connexions entre les commutateurs se font via les ports **Trunk**, qui peuvent transmettre des paquets de n'importe quel VLAN.
 
-## 总结
+## Conclusion
 
-* MAC 层是用来解决多路访问的堵车问题的；
-* ARP 是通过吼的方式来寻找目标 MAC 地址的，吼完之后记住一段时间，这个叫作缓存；
-* 交换机是有 MAC 地址学习能力的，学完了它就知道谁在哪儿了，不用广播了。
-* 当交换机的数目变多，会遭遇环路问题，使用 STP 协议将有环路的图变成没有环路的树解决。
-* 可以通过 VLAN 形成虚拟局域网，从而解决广播问题和安全问题。
-
+* La couche MAC est utilisée pour résoudre les problèmes de congestion de l'accès multiple.
+* L'ARP permet de trouver l'adresse MAC de destination en criant, et après avoir crié pendant un certain temps, cela est enregistré dans un cache, appelé cache ARP.
+* Les commutateurs ont la capacité d'apprentissage des adresses MAC, une fois qu'ils ont appris, ils savent où sont les choses, et il n'y a pas besoin de diffusion.
+* Lorsque le nombre de commutateurs augmente, des problèmes de boucles de connexion peuvent survenir, qui sont résolus en utilisant le protocole STP pour transformer le graphique en un arbre sans boucle.
+* Les VLAN peuvent former des réseaux locaux virtuels pour résoudre les problèmes de diffusion et de sécurité.

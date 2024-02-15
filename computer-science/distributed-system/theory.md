@@ -1,122 +1,123 @@
-# Theory
+# Théorie
 
-## Mutual Exclusion
+## Exclusion Mutuelle
 
-同一时刻只有一个程序能访问一个资源，这种排他性的资源访问方式叫做分布式互斥（Distributed Mutual Exclusion），共享资源叫做临界资源（Critical Resource）。
+À tout moment, seul un programme peut accéder à une ressource, cette méthode d'accès exclusif aux ressources est appelée exclusion mutuelle distribuée, et les ressources partagées sont appelées ressources critiques.
 
-### 集中式算法
+### Algorithme Centralisé
 
-**思想**：引入一个协调者程序，每次需要访问临界资源时需要向协调者发送请求，协调者根据先后顺序发送授权消息。
+**Idée** : Introduire un coordinateur, chaque fois qu'un accès à une ressource critique est nécessaire, une demande doit être envoyée au coordinateur, qui envoie ensuite des messages d'autorisation en fonction de l'ordre d'arrivée.
 
-**特点**：简单、易于实现的特点，但可用性、性能易受协调者影响。
+**Caractéristiques** : Simplicité et facilité de mise en œuvre, mais l'accessibilité et les performances sont facilement influencées par le coordinateur.
 
-### 分布式算法
+### Algorithme Distribué
 
-**思想**：使用组播和逻辑时钟，程序需要使用临界资源时向其它所有节点发送请求，其它节点根据请求时间响应是否授权。
+**Idée** : Utilisation de la diffusion de groupe et de l'horloge logique, lorsqu'un programme a besoin d'une ressource critique, il envoie une demande à tous les autres nœuds, et les autres nœuds répondent en fonction du moment de la demande.
 
-**特点**：“先到先得”和“投票全票通过”的公平访问机制，但通信成本较高，可用性也比集中式算法低，适用于临界资源使用频度较低，且系统规模较小的场景。
+**Caractéristiques** : Mécanisme d'accès juste avec "premier arrivé, premier servi" et "vote unanime", mais coûts de communication élevés et accessibilité inférieure à celle de l'algorithme centralisé. Convient aux situations où l'utilisation des ressources critiques est peu fréquente et où le système est de petite taille.
 
-### 令牌环算法
+### Algorithme de l'Anneau de Jeton
 
-**思想**：所有程序构成一个环，令牌按照顺时针顺序在环之间传递，收到令牌的程序有资格访问临界资源，访问完成后传给下一个程序，若程序在收到令牌后不需要使用资源则直接传给下一个程序。
+**Idée** : Tous les programmes forment un anneau, le jeton circule dans l'anneau dans le sens des aiguilles d'une montre, un programme recevant le jeton est autorisé à accéder à la ressource critique, puis le transmet au programme suivant. Si un programme n'a pas besoin de la ressource après avoir reçu le jeton, il le transmet immédiatement.
 
-**特点**：公平性高，在改进单点故障后，稳定性也很高，适用于系统规模较小，并且系统中每个程序使用临界资源的频率高且使用时间比较短的场景。
+**Caractéristiques** : Grande équité, grande stabilité après l'amélioration des pannes de nœuds uniques. Convient aux systèmes de petite taille où chaque programme utilise fréquemment et brièvement les ressources critiques.
 
-**改进**：两层结构的分布式令牌环，外层是一个令牌环，令牌环的每一个节点又是一个令牌环。
+**Amélioration** : Anneau de jeton distribué en deux niveaux, avec une couche externe formant un anneau, chaque nœud de l'anneau étant à son tour un anneau.
 
-## Election
+## Élection
 
-### Bully 算法
+### Algorithme Bully
 
-选举过程有三种消息：
+Le processus d'élection comprend trois types de messages :
 
-* Election，发起选举。
-* Alive，响应 Election。
-* Victory，宣布自己为主节点。
+* Élection, initier une élection.
+* En vie, réponse à une élection.
+* Victoire, annoncer qu'un nœud est devenu le nœud principal.
 
-**思想**：“长者为大”
+**Idée** : "Les plus âgés sont les plus forts"
 
-**前提条件**：集群中每个节点均知道其它节点的 ID
+**Prérequis** : Chaque nœud du cluster connaît l'ID de tous les autres nœuds.
 
-**选举过程**为，每个节点判断自己的 ID 是否为最大：
+Le processus d'élection consiste à ce que chaque nœud vérifie si son ID est le plus grand :
 
-* 若是最大，则向其它所有节点发送 Victory。
-* 若不是最大：
-  * 向 ID 比自己大的节点发送 Election，并等待回复：
-    * 若在一定时间内没有收到 Alive，则认为自己是主节点，发出 Victory。
-    * 若收到 ID 比自己大的节点发送的 Alive，则等待 Victory。
-* 不管是不是最大，若收到 ID 比自己小发送的 Election，则回复 Alive。
+* Si c'est le plus grand, il envoie une Victoire à tous les autres nœuds.
+* Sinon :
+  * Il envoie une Élection aux nœuds avec des IDs plus grands et attend une réponse :
+    * S'il ne reçoit pas de réponse Alive dans un certain délai, il se considère comme le nœud principal et envoie une Victoire.
+    * S'il reçoit une Alive des nœuds avec des IDs plus grands, il attend une Victoire.
+* Quel que soit le cas, s'il reçoit une Élection d'un nœud avec un ID plus petit, il répond Alive.
 
-**优点**：选举速度快，算法复杂低，简单易实现。
+**Avantages** : Rapidité d'élection, algorithme simple et facile à implémenter.
 
-**缺点**：每个节点都需要全局节点信息。如果一个 ID 较大的节点频繁重启，则会导致频繁重新选举（可优化）。
+**Inconvénients** : Chaque nœud a besoin d'informations globales sur les nœuds. Si un nœud avec un grand ID redémarre fréquemment, cela peut entraîner des élections fréquentes (peut être optimisé).
 
-案例：MongoDB，Elasticsearch。
+Exemples : MongoDB, Elasticsearch.
 
 ### Raft
 
-节点有三种角色：
+Les nœuds ont trois rôles :
 
-* Leader，主节点。
-* Candidate，有资格成为 Leader。
-* Follower，不可以发起选举。
+* Leader, nœud principal.
+* Candidat, prétendant à devenir Leader.
+* Follower, ne peut pas initier d'élections.
 
-思想：“少数服从多数”
+Idée : "La minorité se soumet à la majorité"
 
-选举流程：
+Processus d'élection :
 
-1. 初始时，所有节点都为 Follower。
-2. 开始选主，所有节点转换成 Candidate， 向其它节点发送选主请求。
-3. 其它节点根据收到选举请求的先后顺序，回复是否同意。每个节点只能投一张票。
-4. 获得半数以上的 Candidate 成为 Leader，其它变为 Follower。Leader 和 Follower 会有心跳。
-5. Leader 任期到了或心跳丢了，则新一轮选主。
+1. Au début, tous les nœuds sont des Followers.
+2. Commencez l'élection, tous les nœuds deviennent des Candidats, envoient des demandes d'élection à tous les autres nœuds.
+3. Les autres nœuds répondent en fonction de l'ordre d'arrivée des demandes d'élection. Chaque nœud ne peut voter qu'une fois.
+4. Le Candidat qui obtient la majorité devient le Leader, les autres deviennent des Followers. Le Leader et les Followers envoient des battements de cœur.
+5. Si le mandat du Leader expire ou s'il perd le battement de cœur, une nouvelle élection est lancée.
 
-优点：选举速度快，算法复杂度低，易于实现。
+Avantages : Vitesse d'élection rapide, complexité algorithmique faible, facile à implémenter.
 
-缺点：每个节点都需要互相通信，
+Inconvénients : Chaque nœud doit communiquer avec les autres.
 
-案例：etcd，consul。
+Exemples : etcd, consul.
 
 ### ZAB
 
-案例：zookeeper。
+Exemple : zookeeper.
 
 ## Consensus
 
-分布式共识是多个节点均可独自操作的情况下，使所有节点针对某个状态达成一致的过程。
+Le consensus distribué est le processus par lequel plusieurs nœuds peuvent opérer individuellement, mais où tous les nœuds atteignent un consensus sur un état donné.
 
-上面的分布式选举就是一种主要基于多数投票策略实现的分布式共识。
+Le processus d'élection mentionné ci-dessus est une sorte de consensus distribué principalement basé sur le principe du vote à la majorité.
 
 {% hint style="warning" %}
-一致性与共识的区别：
+Différence entre la cohérence et le consensus :
 
-* 一致性：一个分布式系统中的多个节点对外界呈现的数据或状态是一致的。
-* 共识：分布式系统中的多个节点，彼此之间对某个状态达成一致的过程。
+* Cohérence : plusieurs nœuds dans un système distribué présentent des données ou un état cohérents à l'extérieur.
+* Consensus : processus par lequel plusieurs nœuds dans un système distribué parviennent à un consensus sur un état donné.
 
-所以，一致性强调结果，共识强调达成一致的过程。
+Ainsi, la cohérence met l'accent sur le résultat, tandis que le consensus met l'accent sur le processus de parvenir à un accord.
 {% endhint %}
 
 ### PoW
 
-Proof of work，工作量证明。通过计算能力来竞争，比如所有节点都计算满足某个条件的数值，计算出来后发送给其它节点，其它节点校验这个数值，若校验通过则同意那个节点的权限。这个算力强的节点获得权限后，将信息广播给其它节点。如比特币。
+Proof of Work, preuve de travail. La compétition est basée sur la puissance de calcul, par exemple, tous les nœuds calculent des valeurs satisfaisant une certaine condition, envoient le résultat calculé à d'autres nœuds, et ceux-ci vérifient la valeur. Si la vérification réussit, ils acceptent le droit du nœud. Le nœud avec la plus grande puissance de calcul gagne le droit et diffuse cette information à d'autres nœuds. Comme Bitcoin.
 
-缺点：共识达成的周期长、效率低、资源消耗大。
+Inconvénients : Longue période pour atteindre un consensus, efficacité faible, consommation de ressources élev
+
+ée.
 
 ### PoS
 
-Proof of stake，权益证明。每个节点有数据和持有数据的时间，转换成权益。
+Proof of Stake, preuve d'enjeu. Chaque nœud a des données et une durée de possession des données, qui se transforment en participation.
 
-缺点：容易出现垄断。
+Inconvénients : Risque de monopole.
 
 ### DPoS
 
-Delegated proof of stake，委托权益证明。节点虽然有权益，但是不能操作。但是可以用来投票，权益代表的是投票的权重，投给可信的其它节点。
+Delegated Proof of Stake, preuve d'enjeu déléguée. Les nœuds n'ont pas le droit de fonctionner mais peuvent voter. La participation représente le poids du vote, votant pour d'autres nœuds de confiance.
 
-## Lock
+## Verrouillage
 
-多个进程并发访问同一临界资源，同一时刻只有一个进程可以访问。
+Plusieurs processus accèdent simultanément à une même ressource critique, un seul processus peut accéder à la ressource à la fois.
 
-* 基于关系型数据库实现。
-* [基于缓存实现](../../database/basic.md#fen-bu-shi-suo)。
-* [基于 Zookeeper 实现](../../database/zookeeper-1.md#fen-bu-shi-suo)。
-
+* Implémentation basée sur les bases de données relationnelles.
+* Implémentation basée sur le cache.
+* Implémentation basée sur Zookeeper.

@@ -1,82 +1,80 @@
-# Sort
+# Tri
 
-## Preface
+## Préface
 
-| 算法 | 是否原地 | 是否稳定 | 平均 | 最好 | 最坏 | 基于比较 |
+| Algorithme | En place | Stable | Moyen | Meilleur | Pire | Comparaison basée |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| 冒泡 | 是 | 是 | O\(n^2\) | O\(n\) | O\(n^2\) | 是 |
-| 插入 | 是 | 是 | O\(n^2\) | O\(n\) | O\(n^2\) | 是 |
-| 选择 | 是 | 否 | O\(n^2\) | O\(n^2\) | O\(n^2\) | 是 |
-| 归并 | 否: O\(n\) | 是 | O\(nlogn\) | O\(nlogn\) | O\(nlogn\) | 是 |
-| 快速 | 是 | 否 | O\(nlogn\) | O\(nlogn\) | O\(n^2\) | 是 |
-| 堆 | 是 | 否 |  O\(nlogn\) | O\(nlogn\) | O\(nlogn\) | 是 |
-| 计数 | 否 | 是 |  | O\(n+k\), k数据范围 |  | 否 |
-| 桶 | 否 | 是 |  | O\(n\) |  | 否 |
-| 基数 | 否 | 是 |  | O\(dn\), d位数 |  | 否 |
+| Bulle | Oui | Oui | O\(n^2\) | O\(n\) | O\(n^2\) | Oui |
+| Insertion | Oui | Oui | O\(n^2\) | O\(n\) | O\(n^2\) | Oui |
+| Sélection | Oui | Non | O\(n^2\) | O\(n^2\) | O\(n^2\) | Oui |
+| Fusion | Non: O\(n\) | Oui | O\(nlogn\) | O\(nlogn\) | O\(nlogn\) | Oui |
+| Rapide | Oui | Non | O\(nlogn\) | O\(nlogn\) | O\(n^2\) | Oui |
+| Tas | Oui | Non |  O\(nlogn\) | O\(nlogn\) | O\(nlogn\) | Oui |
+| Compte | Non | Oui |  | O\(n+k\), k plage de données |  | Non |
+| Seau | Non | Oui |  | O\(n\) |  | Non |
+| Radix | Non | Oui |  | O\(dn\), d chiffres |  | Non |
 
-**评价排序算法的维度**：
+**Dimensions d'évaluation des algorithmes de tri**:
 
-1. 时间复杂度：最好、最坏、平均，以及对应的原始数据类型。
-2. 时间复杂度的系数、常数、低阶，时间复杂度反应的是随数据规模 n 增大的增长趋势，一般是在 n 很大的情况下得出。但是在实际中，n 可能不是很大，所以在同一个阶时间复杂度下，需要考虑系数、常数、低阶。
-3. 比较次数与交换（移动）次数的分析。
-4. 内存消耗。**原地排序**（sorted in place）指空间复杂度为 O\(1\) 的排序算法。
-5. 稳定性，如果待排序的序列中存在值相等的元素，经过排序之后，相等的元素之间原有的先后顺序不变。实际中，我们是根据对象的某个 field 来排序，对象还有其它 field，所以需要分析稳定性。例子：订单有时间和金额，希望 order by amount, time，那么先对时间排序，然后用稳定的排序算法对金额排序，得到的结果就是金额从小到大，相同金额从早到晚。
+1. Complexité temporelle : meilleur cas, pire cas, moyen, et les types de données correspondants.
+2. Coefficients, constantes et termes de plus bas ordre de la complexité temporelle. La complexité temporelle reflète la tendance de croissance lorsque la taille des données n augmente, généralement dans des cas où n est grand. Cependant, dans la pratique, n peut ne pas être très grand, donc sous le même ordre de complexité temporelle, il est nécessaire de prendre en compte les coefficients, les constantes et les termes de plus bas ordre.
+3. Analyse du nombre de comparaisons et de mouvements.
+4. Consommation de mémoire. **Tri sur place** (trié sur place) signifie une complexité spatiale de O\(1\) pour l'algorithme de tri.
+5. Stabilité : si la séquence initiale conserve son ordre relatif après le tri. En pratique, nous trions en fonction d'un champ d'objet, et les objets ont d'autres champs, donc la stabilité doit être analysée. Exemple : commandes avec heure et montant, triées par montant, puis triées par un algorithme de tri stable par heure, le résultat sera montant croissant, montant identique dans l'ordre chronologique.
 
-## Bubble Sort
+## Tri à bulles
 
-**描述**：冒泡排序仅会操作相邻的两个元素，比较两个相邻元素，若不满足大小关系，则交换。每次冒泡会让一个元素移动到它应该在的位置，重复 n 次，就完成了 n 个数据的排序。
+**Description** : Le tri à bulles ne traite que les éléments adjacents, compare les deux éléments adjacents et, s'ils ne sont pas dans l'ordre, les échange. Chaque passage de bulle déplace un élément à sa position appropriée, en répétant cela n fois, les données de n sont triées.
 
-![](../../.gitbook/assets/image%20%28155%29.png)
-
-**优化**：当某次冒泡没有数据交换时，则完成排序。
+**Optimisation** : Lorsqu'un passage de bulle n'effectue aucun échange de données, le tri est terminé.
 
 ```java
-public void sort(Integer[] nums) {
+public void tri(Integer[] nums) {
     int n = nums.length;
     for (int i = 0; i < n; i++) {
-        boolean exchanged = false;
+        boolean échangé = false;
         for (int j = 1; j < n - i; j++) {
             if (nums[j - 1] > nums[j]) {
-                exchanged = true;
-                exchange(nums, j - 1, j);
+                échanger(nums, j - 1, j);
+                échangé = true;
             }
         }
-        if (!exchanged) {
+        if (!échangé) {
             break;
         }
     }
 }
-private void exchange(Integer[] nums, int i, int j) {
+private void échanger(Integer[] nums, int i, int j) {
     int tmp = nums[i];
     nums[i] = nums[j];
     nums[j] = tmp;
 }
 ```
 
-**原地排序**：只需要常量级的额外空间。
+**Tri sur place** : Nécessite seulement une mémoire supplémentaire de niveau constant.
 
-**稳定排序**：当相邻两个元素相等时，不交换就行。
+**Tri stable** : Lorsque deux éléments adjacents sont égaux, aucun échange n'est nécessaire.
 
-**最好时间复杂度**：若数据本来有序，则只需要一次冒泡，所以最好为 O\(n\)。
+**Meilleur cas en complexité temporelle** : Si les données sont déjà triées, un seul passage de bulle est nécessaire, donc meilleur cas O\(n\).
 
-**最坏时间复杂度**：若数据刚好为逆序，则要进行 n 次冒泡，所以最坏为 O\(n^2\)。
+**Pire cas en complexité temporelle** : Si les données sont exactement inversées, n passages de bulle sont nécessaires, donc pire cas O\(n^2\).
 
-**平均时间复杂度**：
+**Complexité temporelle moyenne** :
 
-有序度是数组中具有有序关系的元素对的个数，有序元素对定义：`a[i] <= a[j], i < j`。如`2, 4, 3, 1, 5, 6`有序度为`4 + 2 + 2 + 2 + 1 = 11`。完全有序的数组的有序度叫满有序度\(`n * (n - 1) / 2`\)。`逆序度 = 满有序度 - 有序度`。
+Le degré d'ordonnancement est le nombre de paires d'éléments qui ont une relation d'ordre dans le tableau, défini comme suit : `a[i] <= a[j], i < j`. Par exemple, dans `2, 4, 3, 1, 5, 6`, le degré d'ordonnancement est `4 + 2 + 2 + 2 + 1 = 11`. Le degré d'ordonnancement complet du tableau trié est appelé degré d'ordonnancement total (\(n * (n - 1) / 2\)). `Désordre = degré d'ordonnancement total - degré d'ordonn
 
-冒泡有两个比较和交换两个操作，每次交换，有序度加1，所以`交换次数 = 逆序度`。平均交换次数`n * (n - 1) / 4`，比较次数 &gt; 交换次数，时间复杂度上限 O\(n^2\)，所以平均时间复杂度 O\(n^2\)。
+ancement`.
 
-注意此种平均时间复杂度分析并不严格。
+Le tri à bulles a deux opérations de comparaison et d'échange, chaque échange augmente le degré d'ordonnancement de 1, donc `nombre d'échanges = désordre`. Le nombre moyen d'échanges est `n * (n - 1) / 4`, le nombre de comparaisons est supérieur au nombre d'échanges, la limite supérieure de la complexité temporelle est O\(n^2\), donc la complexité temporelle moyenne est O\(n^2\).
 
-## Insertion Sort
+Veuillez noter que cette analyse de la complexité temporelle moyenne n'est pas stricte.
 
-**描述**：将数组分为两个区域，已排序和未排序，初始已排序为第一个元素。每次取未排序的第一个元素，在已排序中找到合适位置插入。
+## Tri par insertion
 
-![](../../.gitbook/assets/image%20%28149%29.png)
+**Description** : Divisez le tableau en deux parties, triées et non triées, initialement triées avec le premier élément. À chaque itération, prenez le premier élément de la partie non triée, trouvez sa position appropriée dans la partie triée et insérez-le.
 
 ```java
-public void sort(Integer[] nums) {
+public void tri(Integer[] nums) {
     int n = nums.length;
     for (int i = 1; i < n; i++) {
         int tmp = nums[i];
@@ -93,30 +91,28 @@ public void sort(Integer[] nums) {
 }
 ```
 
-**特点**：包含比较和移动两种操作。移动次数等于逆序度。
+**Caractéristiques** : Comprend les opérations de comparaison et de déplacement. Le nombre de déplacements est égal au désordre.
 
-**原地排序**：不需要额外存储空间。
+**Tri sur place** : Aucun espace de stockage supplémentaire requis.
 
-**稳定排序**：当两个元素相等时，将后面插入的元素放到前面出现的元素后面，就可以保证顺序不变。
+**Tri stable** : Lorsque deux éléments sont égaux, en insérant l'élément postérieur après l'élément précédent, l'ordre est préservé.
 
-**最好时间复杂度**：如数据本来有序，则不需要搬动任何数据，查找插入位置时从尾到头，则每次只需要比较一次，所以最好为 O\(n\)。
+**Meilleur cas en complexité temporelle** : Si les données sont déjà triées, aucun déplacement de données n'est nécessaire lors de la recherche de la position d'insertion, la recherche de la position d'insertion de chaque élément ne nécessite qu'une seule comparaison, donc le meilleur cas est O\(n\).
 
-**最坏时间复杂度**：如果数据是倒序的，每次都要移动有序区域的所有数据，所以最坏为 O\(n^2\)。
+**Pire cas en complexité temporelle** : Si les données sont exactement inversées, chaque élément doit être déplacé jusqu'à la première position, donc le pire cas est O\(n^2\).
 
-**平均时间复杂度**：在有序数组中插入一个数据的平均时间复杂度为 O\(n\)，所以插入排序的平均时间复杂度为 O\(n^2\)。
+**Complexité temporelle moyenne** : Pour insérer un élément dans un tableau trié, la complexité temporelle moyenne est O\(n\), donc la complexité temporelle moyenne du tri par insertion est O\(n^2\).
 
-**为什么插入排序比冒泡排序更好？**冒泡和插入的交换或移动次数是固定的，等于逆序度。但是冒泡一次交换需要三个操作，差插入一次移动仅需一个操作。
+**Pourquoi le tri par insertion est-il meilleur que le tri à bulles ?** : Le nombre d'échanges ou de déplacements est fixe pour le tri à bulles et le tri par insertion, égal au désordre. Mais chaque échange de tri à bulles nécessite trois opérations, tandis que chaque déplacement de tri par insertion n'en nécessite qu'une seule.
 
-**插入排序优化**：希尔排序，开始用大的步长，最后一次就是普通的插入，但是基本已经排好序。用大的步长是每次可以移动较大的位置。
+**Optimisation du tri par insertion** : Tri de Shell, commencez par de grands écarts, le dernier tri est un tri d'insertion ordinaire, mais la séquence est déjà presque triée. En utilisant de grands écarts, vous pouvez déplacer des positions plus importantes à chaque fois.
 
-## Selection Sort
+## Tri par sélection
 
-**描述**：将数组分为两个区域，已排序和未排序，初始已排序为空，每次找到未排序的最小元素，放入已排序的末尾，即与未排序的第一个元素交换。
-
-![](../../.gitbook/assets/image%20%28256%29.png)
+**Description** : Divisez le tableau en deux parties, triées et non triées, initialement triées vides. À chaque itération, recherchez l'élément le plus petit dans la partie non triée et placez-le à la fin de la partie triée.
 
 ```java
-public void sort(Integer[] nums) {
+public void tri(Integer[] nums) {
     int n = nums.length;
     for (int i = 0; i < n; i++) {
         int min = nums[i];
@@ -134,43 +130,41 @@ public void sort(Integer[] nums) {
 }
 ```
 
-**原地排序**：不需要额外存储空间。
+**Tri sur place** : Aucun espace de stockage supplémentaire requis.
 
-**最好、最坏、平均时间复杂度**：都是 O\(n^2\)。
+**Meilleur, pire, et complexité temporelle moyenne** : Tous O\(n^2\).
 
-**不稳定排序**：每次都从未排序区域中找到最小，与未排序区域的第一个元素交换，破坏了稳定性。
+**Tri instable** : Trouve le plus petit élément dans la partie non triée et l'échange avec le premier élément de la partie non triée, perturbant ainsi l'ordre relatif des éléments égaux.
 
 {% hint style="info" %}
-冒泡排序与选择排序仅用作理论，实际中基本不用，而插入排序有时会用到。
+Les tris à bulles et par sélection ne sont utilisés que pour des raisons théoriques, et sont rarement utilisés en pratique, tandis que le tri par insertion est parfois utilisé.
 {% endhint %}
 
 {% hint style="info" %}
-若是链表实现，冒泡排序的交换操作更加复杂；插入排序不需要移动，直接插入；选择排序的交换同样比较复杂。
+Si implémenté avec des listes chaînées, l'échange du tri à bulles devient plus complexe ; le tri par insertion n'a pas besoin de déplacements, mais une insertion directe ; l'échange du tri par sélection est également plus complexe.
 {% endhint %}
 
-## Merge Sort
+## Tri fusion
 
-**描述**：采用分治的思想。先把数组从中间分成前后两部分，然后对前后两部分分别排序，再将排好序的两部分合并。
-
-![](../../.gitbook/assets/image%20%2857%29.png)
+**Description** : Utilise une approche de division et conquête. Divisez d'abord le tableau en deux moitiés, puis triez les deux moitiés de manière récursive, puis fusionnez les deux moitiés triées.
 
 ```java
-public void sort(Integer[] nums) {
-    mergeSort(nums, 0, nums.length - 1);
+public void tri(Integer[] nums) {
+    triFusion(nums, 0, nums.length - 1);
 }
 
-private void mergeSort(Integer[] nums, int p, int r) {
+private void triFusion(Integer[] nums, int p, int r) {
     if (p >= r) {
         return;
     }
     
     int q = (p + r) / 2;
-    mergeSort(nums, p, q);
-    mergeSort(nums, q + 1, r);
-    merge(nums, p, r);
+    triFusion(nums, p, q);
+    triFusion(nums, q + 1, r);
+    fusionner(nums, p, r);
 }
 
-private void merge(Integer[] nums, int p, int r) {
+private void fusionner(Integer[] nums, int p, int r) {
     int q = (p + r) / 2;
     
     int[] tmp = new int[r - p + 1];
@@ -199,47 +193,50 @@ private void merge(Integer[] nums, int p, int r) {
 }
 ```
 
-**递推公式**：`merge_sort(p, r) = merge(merge_sort(p, q), merge_sort(q + 1, r))`
+**Formule récursive** : `triFusion(p, r) = fusion(triFusion(p, q), triFusion
 
-**终止条件**：`p >= r`；其中，`q = (p + r) / 2`。
+(q + 1, r))`
 
-**稳定排序**：关键看 merge 操作，在 merge 过程中，把 A\[p, q\] 中的元素先放入临时数组，那么值相同的元素保证了顺序不变，所以归并排序是稳定的。
+**Condition d'arrêt** : `p >= r` ; où `q = (p + r) / 2`.
 
-**最好、最坏、平均时间复杂度**：都是 O\(nlogn\)，分析过程如下：
+**Tri stable** : Il dépend de la fusion. Pendant la fusion, en plaçant d'abord les éléments de A\[p, q\] dans un tableau temporaire, l'ordre des éléments égaux est préservé, donc le tri de fusion est stable.
+
+**Meilleur, pire, et complexité temporelle moyenne** : Tous O\(nlogn\), le processus d'analyse est le suivant :
 
 ```text
-// 假设对 n 个元素进行归并排序时间为 T(n)，那么两个子数组进行归并排序的时间都是 T(n/2)，
-// merge 操作的时间复杂度是 O(n)，所以递推公式如下
-T(1)=C
-T(n)=2*T(n/2)+K
+// En supposant que trier n éléments prend T(n) de temps, alors trier deux sous-tableaux prendrait 2 * T(n / 2), 
+// et la fusion prendrait un temps linéaire O(n), donc la formule de récurrence est la suivante
+T(1) = C
+T(n) = 2 * T(n / 2) + K
 ```
 
-其中 K 为将两个子问题合并所需时间，`K = O(n)`。所以归并时间复杂度为 O\(nlogn\)，与原始数据有序程度无关。
+Où K est le temps nécessaire pour fusionner deux sous-problèmes, `K = O(n)`. Ainsi, la complexité temporelle de fusion est O\(nlogn\), indépendamment du degré d'ordonnancement des données d'origine.
 
-**非原地排序**：合并操作需要一个临时数组，最大为 n，所以归并排序的空间复杂度为 O\(n\)。
+**Non tri sur place** : L'opération de fusion nécessite un tableau temporaire, au plus n, donc la complexité spatiale du tri de fusion est O\(n\).
 
-## Quick Sort
+## Tri rapide
 
-**描述**：快排也是分治思想，将 A\[p, r\] 排序，选择 p 到 r 之间任意一个数据作为 pivot（分区点），将小于pivot 的放到左边，大于 pivot 的放到右边，pivot 放到中间。
+**Description** : Le tri rapide suit également le principe de la division et conquête, triant A\[p, r\], en choisissant un élément pivot A\[n\] entre p et r, plaçant les éléments plus petits que le pivot à gauche et les éléments plus grands à droite, puis triant récursivement les deux partitions.
 
 ```java
-public void sort(Integer[] nums) {
-    _sort(nums, 0, nums.length - 1);
+public void tri(Integer[] nums) {
+    _tri(nums, 0, nums.length - 1);
 }
 
-private void _sort(Integer[] nums, int p, int q) {
+private void _tri(Integer[] nums, int p, int q) {
     if (p >= q) {
         return;
     }
     
-    int r = partition(nums, p, q);
-    _sort(nums, p, r - 1);
-    _sort(nums, r + 1, q);
+    int r = partitionner(nums, p, q);
+    _tri(nums, p, r - 1);
+    _tri(nums, r + 1, q);
 }
 
-// 快排的分区函数类似选择排序：将数组分为两个区域，初始已处理为空，
-// 每次从未处理选一个与 pivot 比较，若小于pivot，则放入已处理末尾，即与未处理的第一个元素交换。
-private int partition(Integer[] nums, int p, int q) {
+// La fonction de partitionnement de QuickSort est similaire à celle de SelectionSort : diviser le tableau en deux parties, initialement non traitées,
+// à chaque fois qu'un élément non traité est sélectionné et comparé au pivot, si c'est plus petit que le pivot, alors il est placé à la fin de la partie traitée, 
+// c'est-à-dire échangé avec le premier élément non traité.
+private int partitionner(Integer[] nums, int p, int q) {
     int i = p;
     int pivot = nums[q];
     for (int j = p; j < q; j++) {
@@ -255,96 +252,57 @@ private int partition(Integer[] nums, int p, int q) {
 }
 ```
 
-**递推公式**：`quick_sort(p, r) = quick_sort(p, q - 1) + quick_sort(q + 1, r)`
+**Formule récursive** : `triRapide(p, r) = triRapide(p, q - 1) + triRapide(q + 1, r)`
 
-**终止条件**：`p >= r`
+**Condition d'arrêt** : `p >= r`
 
-**不稳定排序**：快速排序涉及交换，所以不稳定。
+**Tri instable** : Le tri rapide implique des échanges, donc il est instable.
 
-**原地排序**：分区函数不需要额外空间。
+**Tri sur place** : La fonction de partitionnement ne nécessite aucun espace supplémentaire.
 
-**时间复杂度分析**：大部分情况是 O\(nlogn\)，O\(n^2\) 的概率非常小，可以合理选择 pivot 来降低概率。最坏情况即数组已经有序，选择最后一个元素作为 pivot，则时间复杂度为 O\(n^2\)。.
+**Analyse de la complexité temporelle** : Dans la plupart des cas, c'est O\(nlogn\), la probabilité de O\(n^2\) est très faible, un pivot raisonnable peut être choisi pour réduire la probabilité. Le pire des cas est lorsque le tableau est déjà trié, en choisissant le dernier élément comme pivot, alors la complexité temporelle est O\(n^2\).
 
 ```text
 T(1) = C
 T(n) = 2 * T(n / 2) + n
 ```
 
-**归并排序与快速排序的区别**：归并是由下到上，先处理子问题，再合并；快速是由上到下，先分区，再处理子问题。
+**Différence entre le tri fusion et le tri rapide** : La fusion est de bas en haut, traitant d'abord les sous-problèmes, puis les fusionnant ; le rapide est de haut en bas, traitant d'abord la partition, puis les sous-problèmes.
 
-### 求无序数组中第 K 大元素
+### Trouver le k-ième plus grand élément dans un tableau non trié
 
-**思路**：将数组 A\[0:n-1\] 最后一个元素 A\[n-1\] 作为 pivot，原地分区，分成了 A\[0: p - 1\], A\[p\], A\[p + 1: n - 1\]，若 p + 1 = K，则 A\[p\] 就是要求解的，否则按上述思路继续查找。
+**Idée** : Divisez le tableau A\[0:n-1\] en tant que dernier élément A\[n-1\] comme pivot, partitionnez en A\[0:p-1\], A\[p\], A\[p+1:n-1\], si p+1=K, alors A\[p\] est le résultat, sinon répétez le processus comme décrit ci-dessus.
 
-**时间复杂度**：n + n / 2 + n / 4 + n / 8 + ... + 1 = 2n - 1，为 O\(n\)。
+**Complexité temporelle** : n + n / 2 + n / 4 + n / 8 + ... + 1 = 2n - 1, donc O\(n\).
 
-## 线性排序
+## Tri linéaire
 
-线性排序时间复杂度是线性 O\(n\) 的：桶排序、计数排序、基数排序。能做到线性，原因都是非基于比较，不涉及元素之间比较操作。
+La complexité temporelle du tri linéaire est linéaire O\(n\): tri par décompte, tri par base, tri de boîtes. Pouvoir réaliser une complexité temporelle linéaire signifie que l'algorithme ne repose pas sur la comparaison entre éléments et ne nécessite pas de trier en place, ce qui signifie qu'il a une application spécifique.
 
-线性排序对数据的要求很严苛，都有各自的适用场景。
+Le tri linéaire a des exigences très strictes en matière de données et a chacun ses propres scénarios d'application.
 
-### Bucket Sort
+### Tri par décompte
 
-**描述**：将排序的数据分到几个**有序的桶**中，每个桶内单独排序，再按照桶的顺序依次取出。
+**Description** : Si vous devez trier n éléments mais qu'il n'y a que k valeurs possibles, vous pouvez diviser les données en k boîtes, chaque boîte contenant le
 
-**时间复杂度**：O\(n\)。n 个数据，m 个桶，每个桶的数据个数为 k = n / m，`O(m*k*logk) = O(n*log(n/m))`，当 m 接近 n 时，log\(n/m\) 很小。
+ nombre de données correspondant, puis traverser les boîtes pour récupérer les données triées.
 
-**对数据要求**：1. 数据很容易划分成 m 个桶；2. 桶与桶有天然有序；3. 能够比较均匀分布在各个桶中。
+**Caractéristiques** : Il peut trier des données entières, mais pas des données flottantes.
 
-**适用场景**：适合外部排序，数据量大，无法全部加载到内存中。
+**Tri stable** : Si vous souhaitez trier une grande quantité de données avec peu de valeurs possibles, le tri par décompte est le meilleur choix. Mais le tri par décompte n'est pas adapté aux données dispersées.
 
-**案例**：10GB 的订单数据，只有几百 MB 内存，希望按照订单金额排序。1. 扫描一遍文件，得到订单金额所处范围；2. 根据范围分为 100 个桶，每个桶对应一个文件；3. 再扫描一遍，把数据分到 100 个文件中，若分布均匀，每个文件大约 100MB；4. 100 个文件分别放在内存中排序；5. 然后将 100 个文件依次写入到一个文件中；6. 若分布不均匀，则可以对数据比较多的小文件再次分割。
+**Complexité temporelle** : O\(n + k\), où k est la plage de données.
 
-### Counting Sort
+### Tri de base
 
-**描述**：需要排序的 n 个数据，仅有 k 个可能值，则可以把数据划分到 k 个桶中，每个桶内的数据值一样，桶内不需要排序。
+**Description** : Utilisez des boîtes de données en fonction de la valeur du chiffre bas, triez chaque boîte, puis combinez les résultats.
 
-{% hint style="info" %}
-有人认为，计数排序是特殊的桶排序。我认为不是。因为桶排序中，每个桶存放的是所有数据，每个桶单独排序；而计数排序中，每个桶中存放的是数据的个数，算法思路不一样。
-{% endhint %}
+**Tri stable** : Si vous devez trier une grande quantité de données dans la plage [0, 999], trier d'abord par les unités, puis par les dizaines, puis par les centaines. Tri stable, mais la complexité temporelle est élevée.
 
-**流程**：假设数据 A\[n\] 有 k 个可能值。1. 先准备一个大小为 k 的数组 C，C 的下标为数据值，C 的值为数据值的个数；2. 扫描一遍数据，得到 C；3. 对 C 顺序求和，此时 C\[i\] 中存放的是小于等于 i 的个数；4. 准备数组 R\[n\]，从后往前扫描 A\[n\]，若值为 i，则`R[C[i]]=i, C[i]=C[i]-1`。
+**Complexité temporelle** : O\(d \(n + k\)\), d est le nombre de chiffres.
 
-![](../../.gitbook/assets/image%20%2871%29.png)
+### Tri de boîtes
 
-**适用场景**：数据值范围不大；只能给非负整数排序，若是其它类型，在不改变相对大小的情况下，转化为非负整数。
+**Description** : Divisez l'espace des valeurs en petites boîtes, placez chaque valeur dans une boîte correspondante, puis récupérez les valeurs dans l'ordre des boîtes.
 
-**案例**：考生满分 900 分，对高考成绩排序，则可以划分成 901 个桶。
-
-### Radix Sort
-
-**描述**：比如，对手机号排序，从低位开始，每一位分别用线性排序。要求稳定的排序。
-
-![](../../.gitbook/assets/image%20%282%29.png)
-
-{% hint style="info" %}
-若数据不是等长，可以补齐。
-{% endhint %}
-
-**适用场景**：数据可以分割出位，位有递进关系，高位比较大，则低位就不用比较了，每一位的数据范围不大，对每位就可以用线性排序了。
-
-## 工程应用
-
-**如何实现一个通用的、高性能的排序函数**：
-
-* 通用，所以不能选择对数据要求比较严格的线性排序。
-* 小规模数据可选择 O\(n^2\)，大规模一般选择 O\(nlogn\)。
-* O\(nlogn\) 比较多，Java 采用堆排序，C 采用快速排序。
-* 归并用的少，原因是非原地。
-* 解决快排在最坏情况 O\(n^2\) 的方式：a、首、尾、中三个数取中间值；b、随机；
-* 快排递归，防止栈溢出，可以限制深度，也可以手动实现栈。
-
-**Glibc 的 qsort**：
-
-* 优先使用归并，在数据量小时。
-* 数据量大，变成快排。
-* 快排采用三数取中法。
-* 自己在堆上实现栈。
-* 当排序取件小于等于 4 时，退化为插入排序。
-
-**O\(n^2\) 算法不一定比 O\(nlogn\) 执行时间长**：
-
-* 时间复杂度反映的是增长趋势
-* 但是会省略低阶、常数、系数，所以数据量小时，O\(n^2\) 可能会更快。
-
+**Complexité temporelle** : O\(n + m\), où m est le nombre de boîtes.

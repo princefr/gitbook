@@ -1,57 +1,56 @@
-# Transcation
+# Transaction
 
-分布式事务的实现算法有很多，有基于 XA 协议的 2PC、3PC，也有业务的分布式事务实现 TCC，还有基于消息的分布式事务。
+Il existe de nombreux algorithmes pour implémenter les transactions distribuées, tels que le 2PC et le 3PC basés sur le protocole XA, l'implémentation TCC des transactions distribuées basée sur les affaires, ainsi que les transactions distribuées basées sur les messages.
 
-**分布式事务**是多个单机事务的组合。
+**Une transaction distribuée** est la combinaison de plusieurs transactions individuelles.
 
 ## 2PC
 
-二阶段提交（The two-phase commit protocol, 2PC）是 XA 协议的实现方式之一，强一致性。有两个角色，**事务管理器**和**本地资源管理器**。
+Le protocole de validation à deux phases (The two-phase commit protocol, 2PC) est l'une des façons d'implémenter le protocole XA, il garantit une forte cohérence. Il y a deux rôles : le **gestionnaire de transactions** et le **gestionnaire de ressources locales**.
 
-事务管理器为协调者，负责各个本地资源管理器的提交和回滚。
+Le gestionnaire de transactions agit en tant que coordinateur et est responsable de la soumission et du rejet auprès de chaque gestionnaire de ressources local.
 
-2PC 有投票（voting）和提交（commit）两个阶段。
+Le 2PC comporte deux phases : le vote (voting) et la soumission (commit).
 
-1. 事务管理器（协调者）向本地资源管理器（参与者）发送 CanCommit 请求。
-2. 参与者执行事务操作，记录日志但不提交。根据执行成功与否，返回 Yes 或 No 消息。
-3. 协调者根据 Yes 还是 No 发送 DoCommit 或 DoAbort 请求。
-4. 参与者根据 DoCommit 还是 DoAbort 进行事务的提交或回滚，并返回 HaveCommitted 消息。
-5. 协调者接受到 HaveCommitted 消息，表示事务结束。
+1. Le gestionnaire de transactions (coordinateur) envoie une demande CanCommit au gestionnaire de ressources local (participant).
+2. Le participant exécute l'opération de transaction, enregistre le journal mais ne le soumet pas. Selon le succès de l'exécution, il renvoie un message Yes ou No.
+3. Le coordinateur envoie une demande DoCommit ou DoAbort en fonction de Yes ou No.
+4. Le participant soumet ou annule la transaction en fonction de DoCommit ou DoAbort, et renvoie un message HaveCommitted.
+5. Le coordinateur reçoit le message HaveCommitted, ce qui signifie que la transaction est terminée.
 
-缺点：
+Inconvénients :
 
-* 同步阻塞问题：本地资源管理器占有临界资源时，其它资源管理器若要访问同一资源，则会处于阻塞状态。
-* 单点故障问题：一单事务管理发生故障，则整个系统不可用。尤其在提交阶段，资源管理器一直锁定事务资源。
-* 数据不一致问题：若提交阶段由于网络异常，仅部分资源管理器收到 DoCommit 请求，则整个系统数据不一致。
+- Problème de blocage synchrone : lorsque le gestionnaire de ressources local occupe une ressource critique, les autres gestionnaires de ressources qui tentent d'accéder à la même ressource se retrouvent bloqués.
+- Problème de panne unique : si un gestionnaire de transactions tombe en panne, tout le système devient indisponible. En particulier lors de la phase de soumission, le gestionnaire de ressources verrouille constamment les ressources de transaction.
+- Problème d'incohérence des données : si, en raison d'une anomalie réseau, seuls certains des gestionnaires de ressources reçoivent la demande DoCommit, les données de tout le système seront incohérentes.
 
 ## 3PC
 
-三阶段提交协议（Three-phase commit protocol, 3PC）也是 XA 协议的实现方式，强一致性。对 2PC 做了改进，引入了超时机制和准备阶段。
+Le protocole de validation à trois phases (Three-phase commit protocol, 3PC) est également une façon d'implémenter le protocole XA, il garantit une forte cohérence. Il améliore le 2PC en introduisant un mécanisme de temporisation et une phase de préparation.
 
-* 参与者与协调者都有超时机制，超时后，根据当前状态选择提交或终止整个事务。
-* CanCommit、PreCommit、DoCommit 三个阶段。
+- Les participants et le coordinateur ont tous des mécanismes de temporisation et, après expiration, choisissent de soumettre ou d'annuler la transaction en fonction de l'état actuel.
+- Trois phases : CanCommit, PreCommit, DoCommit.
 
-1. 协调者发送 CanCommit 请求。
-2. 参与者根据状态发送 Yes 或 No。
-3. 协调者若收到 No，则发送Abort。若收到全部是 Yes，则发送 PreCommit 请求。
-4. 参与者若收到 Abort 或超时后未收到消息，则执行事务中断。若收到 PreCommit 请求，则执行事务操作，并记录 Undo 和 Redo 日志，并相应 ACK。
-5. 协调者若收到 ACK，则发送 DoCommit 请求。
+1. Le coordinateur envoie une demande CanCommit.
+2. Les participants envoient Yes ou No en fonction de l'état.
+3. Si le coordinateur reçoit un No, il envoie un Abort. S'il reçoit que des Yes, il envoie une demande PreCommit.
+4. Si un participant reçoit un Abort ou si aucun message n'est reçu après expiration, il annule la transaction. S'il reçoit une demande PreCommit, il exécute la transaction, enregistre les journaux Undo et Redo, et envoie un ACK en réponse.
+5. Si le coordinateur reçoit un ACK, il envoie une demande DoCommit.
 
-很少被使用，因为相比于 2PC 需要更多的消息协商，增加系统负载和响应延时。
+Rarement utilisé car il nécessite plus de négociations de messages que le 2PC, ce qui augmente la charge du système et le délai de réponse.
 
 ## TCC
 
-Try-Confirm-Cancel，最终一致。针对每个操作都要注册一个与其对应的确认操作和撤销操作。确认操作和撤销操作必须是幂等的。是一个业务层面的协议，不依赖于数据库的事务，3 个操作都需要在业务代码中实现。
+Try-Confirm-Cancel, cohérence finale. Pour chaque opération, une opération de confirmation et d'annulation correspondante doit être enregistrée. Les opérations de confirmation et d'annulation doivent être idempotentes. C'est un protocole au niveau métier et ne dépend pas des transactions de base de données, les 3 opérations doivent être mises en œuvre dans le code métier.
 
-优点：
+Avantages :
 
-* 不依赖数据库事务。
+- Ne dépend pas des transactions de base de données.
 
-缺点：
+Inconvénients :
 
-* 实现复杂
+- Implémentation complexe.
 
-## 基于消息
+## Basé sur les messages
 
-最终一致。2PC 和 3PC 都需要锁定资源，通过消息可以解决此问题。
-
+Cohérence finale. Le 2PC et le 3PC nécessitent tous deux de verrouiller les ressources, ce qui peut être résolu par des messages.

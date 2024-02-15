@@ -1,9 +1,8 @@
-# Bloom Filter
+# Filtre de Bloom
 
-优点：空间和时间复杂度远超其它算法。
+Avantages : Les avantages en termes d'espace et de temps sont bien supérieurs à ceux des autres algorithmes.
 
-缺点：
+Inconvénients :
 
-* 有一定误识别率。**不存在一定不存在，存在不一定存在**。
-* 删除困难
-
+- Présente un taux de faux positifs non négligeable. **Le non-existant n'est pas certain, l'existant n'est pas nécessairement présent**.
+- Difficulté de suppression.

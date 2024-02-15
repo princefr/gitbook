@@ -1,27 +1,24 @@
 # Skip List
 
-**跳表**（Skip List）可以支持快速的插入、删除、查找，Redis 中的有序集合（Sorted Set）实现用到了跳表。
+The **skip list** can support fast insertion, deletion, and search operations. Skip lists are used in the implementation of sorted sets in Redis.
 
-**描述**：单链表查找时间复杂度为 O\(n\)，把单链表每两个结点提取一个到上一级，作为一级索引，抽出来的叫做索引层。索引层的结点有 down 指针，指向下一级的结点；有 next 指针，指向当前索引层的下一结点，有数据，值为排序的值。在一级索引上，每两个结点抽一个到上一级，作为二级索引。依此类推，增加多级索引。
+**Description**: Searching in a singly linked list has a time complexity of O(n). In a skip list, every two nodes in the singly linked list are extracted to form an upper level, which is called the index level. Nodes in the index level have a `down` pointer pointing to the next level's node, a `next` pointer pointing to the next node in the current index level, and a value representing the sorted value. On the first index level, every two nodes form a node in the higher level, creating a second index level. This process continues, adding multiple index levels.
 
-![](../../.gitbook/assets/image%20%2898%29.png)
+**Time complexity of search**: Assuming there are n data points, there are `n / 2` nodes in the first index level, and `n / (2 ^ k)` nodes in the kth index level. Assuming there are h levels, with 2 nodes in the highest level, `h = log2(n) - 1`. Adding the original level, the height of the skip list is log2(n). **At most 3 nodes are traversed on each level**, resulting in a time complexity of `O(3 * log2(n)) = O(logn)`.
 
-**查找时间复杂度**：假设有 n 个数据，一级索引 `n / 2` 个结点，k 级索引 `n / (2 ^ k)`个结点。假设 h 级，最高级索引有 2 个结点，`h = log2(n) - 1`。加上原始层，跳表高度为 log2\(n\)。**每一级最多遍历 3 个结点**，时间复杂度为`O(3 * log2(n)) = O(logn)`。
+**Space complexity**: `n + n / 2 + n / 4 + n / 8 + ... = n - 2`, which is O(n). In practice, space usage is not a major concern because the nodes in the original linked list are usually large objects, while the nodes in the index levels only need to store key values and pointers, without the need to store the entire object.
 
-**空间复杂度**：`n + n / 2 + n / 4 + n / 8 +... = n - 2`，为 O\(n\)。实际上不用太在意空间，因为原始链表结点一般对象比较大，而索引层的结点只需存储关键值和指针，不需要存储整个对象。
+**Time complexity of insertion**: The time complexity of simply inserting into a singly linked list is O(1), but finding the insertion position takes O(n), resulting in a total complexity of O(n). In a skip list, finding the position takes O(logn), and the insertion itself takes O(1), resulting in a **total complexity of O(logn)**.
 
-**插入时间复杂度**：单链表单纯的插入时间复杂度 O\(1\)，但是找到插入位置需要 O\(n\)，总 O\(n\)。跳表找到位置 O\(logn\)，单纯插入 O\(1\)，**总 O\(logn\)**。
+**Deletion operation**: In addition to deleting nodes in the original linked list, nodes in the index levels need to be deleted if they exist.
 
-**删除操作**：除了删除原始链表中的结点，若在索引中，还需删除索引中的结点。
+**Dynamic updates**: When continuously inserting nodes, it is possible to have a large number of data points between two index nodes, which may reduce query efficiency. Skip lists maintain balance through a random function. For example, when inserting a node, a random function generates K, and then this node is added to the index levels from the first level to the Kth level. The selection of the random function is crucial, as it ensures the balance between the size of the skip list's index and the size of the data, preventing excessive performance degradation.
 
-**动态更新**：当不停插入时，可能出现两个索引节点之间数据非常多的情况，会降低查询效率。跳表通过随机函数保持平衡，比如当插入一个结点时，随机函数生成 K，则将这个结点添加到第一级到第 K 级索引中。随机函数的选择很有讲究，从概率上来讲，能够保证跳表的索引大小和数据大小平衡性，不至于性能过度退化。
+**Why Redis sorted sets choose skip lists over red-black trees**:
 
-**Redis 有序集合为什么选择跳表而不是红黑树：**
-
-1. redis有序集合 API 有插入、删除、查找、按照区间查找、迭代输出有序序列，除了按照区间查找，其它操作红黑树也可完成，时间复杂度也一样，但是**按照区间查找，跳表效率更高**。
-2. 跳表代码**实现较简单**。
+1. The Redis sorted set API includes operations such as insertion, deletion, search, search by range, and iterative output of ordered sequences. Except for search by range, other operations can also be accomplished with red-black trees, and the time complexity is the same. However, **skip lists are more efficient for search by range**.
+2. The **implementation of skip lists is simpler**.
 
 {% hint style="info" %}
-跳表不能完全替代红黑树，因为红黑树出现早，很多编程语言的 Map 通过红黑树实现的，可直接用。而跳表需要自己实现。
+Skip lists cannot completely replace red-black trees because red-black trees have been around for a long time, and many programming languages implement maps using red-black trees, which can be used directly. Skip lists need to be implemented manually.
 {% endhint %}
-

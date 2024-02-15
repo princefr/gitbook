@@ -1,12 +1,9 @@
-# Computing
+# Informatique
 
 ## Map-Reduce
 
-Map-Reduce 是用了[分治的思想](../algorithm/divide-and-conquer.md)，所以能够用 MR 解决的问题也需要满足分治的条件。
+Map-Reduce utilise le [principe de la division et de la conquête](../algorithm/divide-and-conquer.md), donc les problèmes résolus par MR doivent également satisfaire aux conditions de la division et de la conquête.
 
-MapReduce 分为 Map 和 Reduce两个核心阶段，Map 负责把任务拆分成若干个简单的任务，Reduce 负责对简单任务的合并。
+MapReduce se compose de deux étapes principales : Map et Reduce. Map est responsable de la division de la tâche en plusieurs tâches simples, tandis que Reduce est responsable de la fusion des tâches simples.
 
 ![](../../.gitbook/assets/image%20%28276%29.png)
-
-
-

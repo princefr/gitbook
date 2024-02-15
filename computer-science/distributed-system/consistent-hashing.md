@@ -1,20 +1,19 @@
-# Consistent Hashing
+# Hashage Consistant
 
-若总共有三个节点。
+Si nous avons un total de trois nœuds.
 
-## 原始的 Hash 算法
+## Algorithme de Hashage Original
 
-丢失一个节点后，总数变化，失效数据大于 1/3 。
+Après la perte d'un nœud, le nombre total change et les données invalides dépassent 1/3.
 
-## 一致性 Hash 算法
+## Algorithme de Hashage Consistant
 
-丢失一个节点后，失效数据等于 1/3 。所有失效数据请求到一个节点。
+Après la perte d'un nœud, les données invalides sont égales à 1/3. Toutes les requêtes de données invalides sont redirigées vers un seul nœud.
 
-## 虚拟节点
+## Nœuds Virtuels
 
-丢失一个节点后，失效数据等于 1/3。所有失效数据请求到剩下的各个节点。
+Après la perte d'un nœud, les données invalides sont égales à 1/3. Toutes les requêtes de données invalides sont réparties entre les différents nœuds restants.
 
-## Hash Slot
+## Fente de Hashage
 
-Redis 使用的。
-
+Utilisé par Redis.

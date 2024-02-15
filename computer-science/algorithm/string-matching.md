@@ -1,48 +1,48 @@
-# String Matching
+# Recherche de chaînes
 
-在字符串 A 中查找字符串 B，A 叫做**主串**，B 叫做**模式串**。
+Recherche de la chaîne B dans la chaîne A, où A est appelée la **chaîne principale** et B est appelée le **patron**.
 
 ## BF
 
-Brute Force，暴力匹配算法或朴素匹配算法。
+Brute Force, algorithme de recherche brute ou algorithme de recherche naïve.
 
-**思想**：主串长度为 n，模式串长度为 m，在主串中，从起始位置 0、1、2 ... n-m 且长度为 m 的 n - m + 1 个子串中，看有没有和模式串匹配的。
+**Idée** : La longueur de la chaîne principale est n, la longueur du patron est m. Dans la chaîne principale, à partir de la position initiale 0, 1, 2 ... n-m et avec une longueur de m, on regarde s'il y a une correspondance avec le patron.
 
-最差时间复杂度 O\(n\*m\)，最差情况下，每次需要对比 m 个字符，需要对比 n - m + 1 次。
+La complexité temporelle la plus défavorable est O\(n\*m\), dans le pire des cas, il faut comparer m caractères à chaque fois, ce qui nécessite m - n + 1 comparaisons.
 
 {% hint style="info" %}
-尽管 BF 算法的时间复杂度很高，但是实际开发中较常用，原因是：
+Bien que la complexité temporelle de l'algorithme BF soit élevée, il est souvent utilisé dans le développement réel pour les raisons suivantes :
 
-* 大部分情况下，模式串和主串都不太长。
-* 每次模式串与主串中的子串比较时，中途遇到不能匹配的，就能提前停止，大部分情况不会达到最差时间复杂度。
-* 思想简单，实现简单，不易出错。
+* Dans la plupart des cas, ni la chaîne principale ni le patron ne sont très longs.
+* À chaque comparaison du patron avec une sous-chaîne de la chaîne principale, s'il y a une non-correspondance, on peut arrêter prématurément, ce qui évite généralement d'atteindre la complexité temporelle maximale.
+* L'idée est simple, l'implémentation est simple, ce qui réduit les risques d'erreurs.
 {% endhint %}
 
 ## RK
 
-Rabin-Karp 算法，由两位发明者命名的。
+L'algorithme Rabin-Karp, nommé d'après ses deux inventeurs.
 
-BF 算法中，每次模式串与主串的子串比较时，都需要比较模式串的每个字符。RK 的核心思路就是计算 n - m + 1 个子串的 hash 值，然后与模式串的 hash 值比较，hash 的比较就非常快了。
+Dans l'algorithme BF, chaque fois que le patron est comparé avec une sous-chaîne de la chaîne principale, chaque caractère du patron doit être comparé. L'idée centrale de RK est de calculer les valeurs de hachage de n - m + 1 sous-chaînes, puis de comparer les valeurs de hachage avec celle du patron, ce qui accélère considérablement la comparaison.
 
-但是所有子串计算 hash 值的时候还是要遍历每个子串的所有字符，此时就需要设计一个 hash 算法来优化。
+Cependant, le calcul des valeurs de hachage pour toutes les sous-chaînes nécessite toujours de parcourir chaque caractère de chaque sous-chaîne, ce qui nécessite la conception d'un algorithme de hachage pour optimiser cela.
 
-核心思路是 **hash 值的计算可以利用前一个子串的计算结果**。比如：假设匹配的字符串的字符集只有 K 个字符，可以用 K 进制数来表示一个字符，转换为 10 进制数作为 hash 值。
+L'idée principale est que **le calcul des valeurs de hachage peut utiliser le résultat de calcul de la sous-chaîne précédente**. Par exemple : supposons que l'ensemble de caractères à rechercher ne comporte que K caractères, on peut utiliser un nombre en base K pour représenter un caractère, converti en nombre en base 10 comme valeur de hachage.
 
-时间复杂度 O\(n\)。
+La complexité temporelle est O\(n\).
 
-如果考虑 hash 冲突，在 hash 值相等后还需要比较原始的字符串。
+Si l'on considère les collisions de hachage, après l'égalité des valeurs de hachage, il est encore nécessaire de comparer les chaînes originales.
 
 ## BM
 
-Boyer-Moore 算法包含两部分，坏字符规则（bad character rule）和好后缀规则（good suffix shift）。
+L'algorithme Boyer-Moore comprend deux parties, la règle du mauvais caractère (bad character rule) et la règle du bon suffixe (good suffix shift).
 
-模式串与主串的匹配过程可以看做是模式串不断在主串中往后移动。当遇到不匹配时，BF、RK 算法是模式串往后移动一位；BM 算法的本质就是寻找规则，让模式串尽可能往后多移动几位。
+Le processus de correspondance du patron et de la chaîne principale peut être vu comme le patron se déplaçant continuellement vers l'arrière dans la chaîne principale. Lorsqu'une non-correspondance est rencontrée, les algorithmes BF et RK déplacent le patron d'une position vers l'arrière ; l'essence de l'algorithme BM est de chercher des règles pour permettre au patron de se déplacer vers l'arrière le plus possible.
 
-### 坏字符规则
+### Règle du mauvais caractère
 
-首先是按照模式串下标从大到小倒着匹配。当发现某个字符（**坏字符**）无法匹配时，坏字符对应模式串中的下标为 si，然后拿这个坏字符在模式串中**从后往前**查找，找到下标为 xi，若没有找到 xi = -1，那么模式串就往后移动 si - xi 位。
+Tout d'abord, on fait correspondre en commençant par les index du patron en ordre décroissant. Lorsqu'un caractère (le **mauvais caractère**) ne peut pas correspondre, la position du mauvais caractère dans le patron est notée si, puis ce mauvais caractère est recherché **depuis l'arrière** dans le patron pour trouver l'index xi. Si xi n'est pas trouvé, xi = -1, alors le patron est déplacé si - xi positions vers l'arrière.
 
-如下例子，从后往前匹配，c 是坏字符，si = 2，xi = -1，所以模式串往后移动 3 位。移动完成后接着匹配，a 为坏字符，si = 2，xi = 0，所以模式串往后移动 2 位。
+Dans l'exemple ci-dessous, lors de la correspondance en partant de la fin, c est le mauvais caractère, si = 2, xi = -1, donc le patron est déplacé de 3 positions vers l'arrière. Après le déplacement, la correspondance se poursuit ; a est le mauvais caractère, si = 2, xi = 0, donc le patron est déplacé de 2 positions vers l'arrière.
 
 ```text
 a b c a c a b d c
@@ -51,60 +51,62 @@ a b d
           a b d
 ```
 
-**最好时间复杂度**：O\(n/m\)。主串：aaabaaabaaab，模式串：aaaa。
+**Meilleure complexité temporelle** : O\(n/m\). Chaîne principale : aaabaaabaaab, patron : aaaa.
 
-**问题**：主串：aaaaaaaaaaa，模式串：baaa，按照刚才的算法还会后退。
+**Problème** : Chaîne principale : aaaaaaaaaaa, patron : baaa, selon l'algorithme précédent, il y aurait encore un déplacement vers l'arrière.
 
-### 好后缀规则
+### Règle du bon suffixe
 
-**后缀子串**：最后一个字符对齐，如 abc 的后缀子串有 c、bc。  
-**前缀子串**：起始字符对齐，如 abs 的前缀子串有 a、ab。
+**Sous-chaîne suffixe** : correspondance en alignant le dernier caractère, par exemple, abc a pour sous-chaînes suffixes c, bc.  
+**Sous-chaîne préfixe** : correspondance en alignant le premier caractère, par exemple, abs a pour sous-chaînes préfixes a, ab.
 
-模式串与主串从后往前比较时，在发现坏字符时，前面已经有部分匹配了，匹配的部分叫做**好后缀**。如下，坏字符为 a，好后缀为 ca。
+Lorsque le patron est comparé à la chaîne principale de l'arrière vers l'avant, en cas de non-correspondance, une partie de la correspondance est déjà effectuée à l'avance, cette partie de la correspondance est appelée **bon suffixe**. Par exemple, avec le mauvais caractère a, le bon suffixe est ca.
 
 ```text
 a b c a c a b d c
     d b c a
 ```
 
-**原理**：模式串已经匹配好的好后缀部分记做 {u}，然后好后缀在模式串中继续查找，找另一个与 {u} 匹配的 {u\*}：
+**Principe** : La partie du bon suffixe du patron déjà appariée est notée {u}, puis le bon suffixe continue à être recherché dans le patron pour trouver un autre {u\*} correspondant :
 
-* 若能找到 u{\*}，就将模式串滑动到 {u\*} 与主串中好后缀对齐的位置。
-* 若不能找到 u{\*}，就查看**好后缀的后缀子串**是否存在与**模式串的前缀子串**匹配的情况，并找到**最长的 {v}**，然后模式串滑动到 {v} 与主串中 {v} 对齐的部分。
+* Si {u\*} peut être trouvé, alors le patron est glissé jusqu'à ce que {u\*} soit aligné avec le bon suffixe dans la chaîne principale.
+* Si {u\*} ne peut pas être trouvé, on vérifie si **une sous-chaîne suffixe du bon suffixe** correspond à **une sous-chaîne préfixe du patron**, et on trouve **la plus longue {v}**, puis le patron est glissé jusqu'à ce que {v} soit aligné avec la partie correspondante {v
+
+} dans la chaîne principale.
 
 ```text
-// {u} = de，情况 1 能找到 {u*}
+// {u} = de, cas 1 où {u*} peut être trouvé
 a b c d e f g
 d e a d e
       d e a d e
 
-// {u} = de，情况 2 不能找到 {u*}，{v} = d
+// {u} = de, cas 2 où {u*} ne peut pas être trouvé, {v} = d
 a b c d e f g
 e a a d e
         e a a d e
 ```
 
 {% hint style="info" %}
-分别计算好后缀和坏字符规则的滑动长度，取最长的滑动。
+Calculer séparément les longueurs de déplacement des règles du bon suffixe et du mauvais caractère, puis choisir le déplacement le plus long.
 {% endhint %}
 
 ## KMP
 
-KMP 算法与 KM 本质一样，在模式串与主串匹配过程中，若遇到不匹配的，则寻找规律尽量使模式串多往后移动几位。
+L'algorithme KMP est essentiellement le même que l'algorithme KM. Pendant le processus de correspondance du patron et de la chaîne principale, s'il y a une non-correspondance, on cherche des règles pour permettre au patron de se déplacer le plus en arrière possible.
 
-## Trie 树
+## Arbre Trie
 
-Trie 树，也叫字典树。专门用于处理字符串匹配的数据结构，解决在一组字符串集合中快速查找某个字符串的问题。
+L'arbre Trie, également appelé arbre de préfixes. Une structure de données spécialement conçue pour la recherche de chaînes, résolvant le problème de la recherche rapide d'une chaîne dans un ensemble de chaînes.
 
-**本质**：利用字符串之间的公共前缀，将重复的前缀合并在一起。
+**Essence** : En utilisant les préfixes communs entre les chaînes, les préfixes répétés sont fusionnés.
 
-如下图所示，根节点不包含任何信息，每个节点表示一个字符串中的字符，从根节点到红色节点的路径表示一个字符串。注意：**红色节点不一定为叶子节点**。
+Comme illustré ci-dessous, le nœud racine ne contient aucune information, chaque nœud représente un caractère dans une chaîne, le chemin de la racine au nœud rouge représente une chaîne. Note : **le nœud rouge n'est pas nécessairement une feuille**.
 
 ![](../../.gitbook/assets/image%20%28214%29.png)
 
 ```java
-// 假设字符串中只有 a~z 26个小写字母。这种存储方式比较消耗内存。
-// 节点可以换成其它数据结构来节约内存，比如跳表、散列表、红黑树等
+// Supposons que la chaîne ne contienne que 26 lettres minuscules de l'alphabet anglais. Cette méthode de stockage consomme beaucoup de mémoire.
+// Les nœuds peuvent être remplacés par d'autres structures de données pour économiser de la mémoire, comme les listes chaînées, les tables de hachage, les arbres rouge-noir, etc.
 class TrieNode {
   char data;
   TrieNode children[26];
@@ -112,25 +114,24 @@ class TrieNode {
 }
 ```
 
-**时间复杂度**：构建 Trie 树为 O\(n\)，n 表示所有字符串长度总和，构建仅需一次；查找为 O\(k\)，k 为需要查找字符串的长度。
+**Complexité temporelle** : La construction de l'arbre Trie est O\(n\), où n représente la somme des longueurs de toutes les chaînes, la construction ne nécessite qu'une seule fois ; la recherche est O\(k\), où k est la longueur de la chaîne à rechercher.
 
-**适用条件**：
+**Conditions d'application** :
 
-* 字符集不能太多，不然会消耗很多内存；若节点改成其它数据结构，就会降低效率。
-* 字符串前缀重复较多。
+* L'ensemble de caractères ne doit pas être trop grand, sinon beaucoup de mémoire sera consommée ; si les nœuds sont remplacés par d'autres structures de données, cela réduira l'efficacité.
+* Les préfixes des chaînes sont souvent répétés.
 
-**适用场景**：
+**Scénarios d'application** :
 
-* 自动不全
-* 搜索关键字提示
+* Auto-complétion
+* Suggestions de mots-clés de recherche
 
-**与散列表、红黑树比较**：精确匹配适合散列表、红黑树等数据结构；前缀匹配适合 Trie 树。
+**Comparaison avec les tables de hachage, les arbres rouge-noir** : La correspondance précise convient aux structures de données telles que les tables de hachage et les arbres rouge-noir ; la correspondance de préfixe convient à l'arbre Trie.
 
-### 例题
+### Exemple
 
-* [LeetCode 208：实现字典树。](https://github.com/StoneYunZhao/algorithm/blob/master/src/main/java/com/zhaoyun/leetcode/tree/LT208.java)
+* [LeetCode 208 : Implémentation de l'arbre Trie.](https://github.com/StoneYunZhao/algorithm/blob/master/src/main/java/com/zhaoyun/leetcode/tree/LT208.java)
 
-## AC 自动机
+## Automate AC
 
-Aho–Corasick 算法是基于 Trie 树的一种改进算法。
-
+L'algorithme Aho–Corasick est une amélioration de l'arbre Trie.

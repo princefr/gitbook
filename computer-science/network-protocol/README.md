@@ -1,34 +1,29 @@
-# Network Protocol
+# Protocole Réseau
 
-《计算机组成与系统结构》、[《数据结构与算法》](../algorithm/)、《操作系统》、《计算机网络》、《编译原理》是大学计算机的核心课程。
+Les cours fondamentaux de l'informatique à l'université comprennent "Organisation et Architecture des Ordinateurs", "Structures de Données et Algorithmes", "Systèmes d'Exploitation", "Réseaux Informatiques" et "Compilation".
 
-新技术层出不穷，网络协议是你到了 45 岁之后任然有价值的知识。
+Avec l'émergence continue de nouvelles technologies, la connaissance des protocoles réseau reste précieuse même après l'âge de 45 ans.
 
-协议的三要素：
+Les trois éléments essentiels d'un protocole sont :
 
-* 语法：一段内容要符合一定的规则和格式。如括号要成对。
-* 语义：一段内容要代表某种意义。如数字减去数字是有意义的。
-* 顺序。
+- Syntaxe : Un contenu doit respecter des règles et un format spécifiques, par exemple, les parenthèses doivent être appariées.
+- Sémantique : Un contenu doit représenter une signification particulière, par exemple, la soustraction de nombres a une signification.
+- Séquence.
 
-只有通过网络协议，才能使一大片机器互相协作，共同完成一件事。
+Ce n'est qu'avec des protocoles réseau que de nombreux appareils peuvent coopérer et accomplir une tâche commune.
 
-起初，TCP/IP 的设计者提出分层，它分为四层。TCP/IP 发明于 1970年代，当时还有很多网络协议，整个网络世界比较混乱。这时候国际标准组织（ISO）想来个大统一，于是设计了 OSI，开放式系统互联通信参考模型（Open System Interconnection Reference Model）。OSI 分为 7 层，设计参考了 TCP/IP 的分层，所以四层和七层有不是很精确的对应关系：
+À l'origine, les concepteurs de TCP/IP ont proposé une architecture en couches comprenant quatre couches. TCP/IP a été inventé dans les années 1970, à une époque où de nombreux protocoles réseau existaient encore, rendant le paysage des réseaux plutôt chaotique. À ce moment-là, l'Organisation Internationale de Normalisation (ISO) a envisagé une normalisation globale et a donc conçu OSI, le modèle de référence pour l'interconnexion des systèmes ouverts (Open System Interconnection Reference Model). OSI se compose de 7 couches et a été conçu en référence à la stratification de TCP/IP, mais il n'y a donc pas de correspondance précise entre les quatre couches et les sept couches :
 
-![](../../.gitbook/assets/image%20%28211%29.png)
+OSI décompose les choses en trop de détails au-dessus des quatre couches, et lorsque TCP/IP est appliqué dans la pratique, la gestion des sessions, la conversion de l'encodage, la compression, etc., sont étroitement liées aux applications spécifiques, il est donc difficile de les séparer, c'est pourquoi les couches 5 et 6 ont disparu.
 
-OSI 在四层以上分的太细，TCP/IP 在实际应用时会话管理、编码转换、压缩等和具体应用紧密联系，很难分开，所以 5、6层就不见了。
-
-| 层级 | 协议 |
+| Couche | Protocoles |
 | :--- | :--- |
-| [应用层](application-layer.md) | [DHCP,](application-layer.md#dhcp) [HTTP](application-layer.md#http), [HTTPS](application-layer.md#https), RTMP, P2P, [DNS](application-layer.md#dns), GTP, RPC |
-| [传输层](transport-layer.md) | [UDP](transport-layer.md#udp), [TCP](transport-layer.md#tcp) |
-| [网络层](network-layer.md) | [ICMP](network-layer.md#icmp), [IP](network-layer.md#ip), [OSPF](network-layer.md#ospf), [BGP](network-layer.md#bgp), IPSec, GRE |
-| [链路层](data-link-layer.md) | [ARP](data-link-layer.md#arp), [VLAN](data-link-layer.md#vlan), [STP](data-link-layer.md#stp) |
-| [物理层](pysical-layer.md) | [网络跳线](pysical-layer.md#8p-8-c), [集线器](pysical-layer.md#hub) |
+| [Couche Application](application-layer.md) | [DHCP](application-layer.md#dhcp), [HTTP](application-layer.md#http), [HTTPS](application-layer.md#https), RTMP, P2P, [DNS](application-layer.md#dns), GTP, RPC |
+| [Couche Transport](transport-layer.md) | [UDP](transport-layer.md#udp), [TCP](transport-layer.md#tcp) |
+| [Couche Réseau](network-layer.md) | [ICMP](network-layer.md#icmp), [IP](network-layer.md#ip), [OSPF](network-layer.md#ospf), [BGP](network-layer.md#bgp), IPSec, GRE |
+| [Couche Liaison de Données](data-link-layer.md) | [ARP](data-link-layer.md#arp), [VLAN](data-link-layer.md#vlan), [STP](data-link-layer.md#stp) |
+| [Couche Physique](pysical-layer.md) | [Câbles Réseau](pysical-layer.md#8p-8-c), [Concentrateurs](pysical-layer.md#hub) |
 
-只要是在网络上跑的包，都是完整的。可以有下层没有上层，绝对不可能有上层没有下层。比如对于 TCP 协议，无论是三次握手、重试，只要想发出去包，就一定有 IP 和 MAC 层。
+Tout paquet circulant sur le réseau est complet. Il peut y avoir des couches inférieures sans couches supérieures, mais il est absolument impossible d'avoir des couches supérieures sans couches inférieures. Par exemple, pour le protocole TCP, qu'il s'agisse de l'établissement d'une connexion en trois temps, de tentatives de retransmission, tant qu'un paquet doit être envoyé, il doit absolument y avoir les couches IP et MAC.
 
-对于 UDP、TCP 在操作系统的实现，采用 [Socket 编程](transport-layer.md#socket-bian-cheng)。
-
-
-
+Pour l'implémentation des protocoles UDP et TCP dans les systèmes d'exploitation, on utilise la [Programmation Socket](transport-layer.md#socket-bian-cheng).

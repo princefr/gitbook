@@ -1,37 +1,37 @@
 # Graph
 
-## 概念
+## Concept
 
-**图**（Graph）是一种非线性表结构。图中的元素叫做**顶点**（vertex），图中的顶点可以与任意其它顶点建立连接，这种连接叫做**边**（edge），与顶点相连接的边数叫做**度**（degree）。
+A **graph** (图) is a non-linear data structure composed of **vertices** (顶点) connected by **edges** (边). Vertices in a graph can be connected to any other vertex, and this connection is referred to as the **degree** (度) of the vertex.
 
-边有方向的图叫做**有向图**，比如微博的用户关注与粉丝的关系，有向图中的度分为**出度**（Out-degree）和**入度**（In-degree）。入度表示指向这个顶点的边数，即粉丝数；出度表示这个顶点指向多少个其它顶点，即关注数。边没有方向的叫做**无向图**，比如微信好友关系。
+A graph with directed edges is called a **directed graph** (有向图). For example, the relationship between followers and fans on Weibo forms a directed graph, where the degree of a vertex is divided into **out-degree** (出度) and **in-degree** (入度). In-degree represents the number of edges pointing to a vertex, i.e., the number of followers; out-degree represents the number of other vertices a vertex points to, i.e., the number of users being followed. A graph without directed edges is called an **undirected graph** (无向图), such as the friend relationship on WeChat.
 
-边有权重的图叫做**带权图**（weighted graph），比如 qq 好友的亲密度。
+A graph with weighted edges is called a **weighted graph** (带权图), such as the intimacy between QQ friends.
 
-所有的顶点都是连通的图叫做**连通图**。
+A graph where all vertices are connected is called a **connected graph** (连通图).
 
-## 存储
+## Storage
 
-### 邻接矩阵
+### Adjacency Matrix
 
-邻接矩阵（Adjacency Matrix）底层依赖于一个二维数组。如下图：
+An **adjacency matrix** (邻接矩阵) relies on a two-dimensional array. For example:
 
 ![](../../.gitbook/assets/image%20%28110%29.png)
 
-**缺点**：浪费存储空间。若是无向图，就白白浪费一半。若是稀疏图，则浪费非常严重，比如微信几亿用户。
+**Drawback**: Wastes storage space. For an undirected graph, half of the space is wasted. For a sparse graph, the waste is significant, such as in WeChat with hundreds of millions of users.
 
-**优点**：获取顶点关系时非常高效；方便计算，很多问题可以转换为矩阵计算。
+**Advantage**: Efficient when accessing vertex relationships; convenient for calculations, as many problems can be converted into matrix calculations.
 
-### 邻接表
+### Adjacency List
 
-邻接表（Adjacency List）底层依赖于一维数组 + 列表。每个顶点对应一个列表。如下图：
+An **adjacency list** (邻接表) relies on a one-dimensional array + lists. Each vertex corresponds to a list. For example:
 
 ![](../../.gitbook/assets/image%20%28227%29.png)
 
-这就是时间换空间的思想。尽管节约了很多空间，但是使用起来比较耗时。
+This is the principle of trading time for space. Although it saves a lot of space, it is relatively time-consuming to use.
 
 ```java
-// 无向图的实现
+// Implementation of an undirected graph
 public final class Graph {
     private final int v;
     private final List<Integer>[] adj;
@@ -51,19 +51,19 @@ public final class Graph {
 }
 ```
 
-**优化**：可以将列表换成其它数据结构，比如红黑树、跳表、散列表、有序动态数组（可用二分查找）等。
+**Optimization**: Lists can be replaced with other data structures, such as red-black trees, skip lists, hash tables, ordered dynamic arrays (usable for binary search), etc.
 
 {% hint style="info" %}
-对于有向图来说，列表存储的是顶点指向的顶点，所以很容易查找用户关注了哪些用户。但是若要查找用户的粉丝列表，就很困难。所以需要一个**逆邻接表**，顶点存储的是指向它的顶点。
+For a directed graph, the list stores the vertices pointed to by the vertex. Therefore, it is easy to find out which users a user follows. However, it is difficult to find the list of followers for a user. Therefore, an **inverse adjacency list** is needed, where vertices store the vertices pointing to them.
 {% endhint %}
 
 ## BFS
 
-广度优先搜索（Breath-First-Search）即先查找最近的，然后是次近的。
+Breadth-First Search (BFS) searches the nearest vertices first, then the next nearest ones.
 
 ```java
 /**
-* bfs 搜索到的路径就是最短路径
+* The paths found by BFS are the shortest paths.
 */
 public void bfs(int s, int t) {
     int[] prev = new int[v];
@@ -97,19 +97,19 @@ public void bfs(int s, int t) {
 }
 ```
 
-时间复杂度 O\(E\)，空间复杂度 O\(V\)，E 表示边数，V 表示顶点数。
+Time complexity: O\(E\), Space complexity: O\(V\), where E is the number of edges, and V is the number of vertices.
 
-### 例题
+### Example Problems
 
-* [LeetCode 102：二叉树按层输出。](https://github.com/StoneYunZhao/algorithm/blob/master/src/main/java/com/zhaoyun/leetcode/tree/LT102.java)
+* [LeetCode 102: Binary Tree Level Order Traversal](https://github.com/StoneYunZhao/algorithm/blob/master/src/main/java/com/zhaoyun/leetcode/tree/LT102.java)
 
 ## DFS
 
-深度优先搜索（Depth-First-Search）采用的是回溯思想，非常适合递归实现。
+Depth-First Search (DFS) uses backtracking and is highly suitable for recursive implementation.
 
 ```java
 /**
-* dfs 搜索到的路径不一定是最短路径
+* The paths found by DFS are not necessarily the shortest paths.
 */
 public void dfs(int s, int t) {
     final AtomicReference<Boolean> found = new AtomicReference<>(false);
@@ -140,14 +140,13 @@ private void recurDfs(AtomicReference<Boolean> found, boolean[] visited, int[] p
 }
 ```
 
-时间复杂度 O\(E\)，空间复杂度 O\(V\)，E 表示边数，V 表示顶点数。
+Time complexity: O\(E\), Space complexity: O\(V\), where E is the number of edges, and V is the number of vertices.
 
 {% hint style="info" %}
-DFS 和 BFS 是最简单的两种搜索方法，简单粗暴，没有什么优化，也叫做暴力搜索算法。**适合于状态空间不大的图的搜索。**
+DFS and BFS are the simplest two search methods, straightforward and without much optimization, also known as brute-force search algorithms. **Suitable for searching graphs with a small state space.**
 {% endhint %}
 
-### 例题
+### Example Problems
 
-* [LeetCode 104：二叉树叶子节点的最小深度。](https://github.com/StoneYunZhao/algorithm/blob/master/src/main/java/com/zhaoyun/leetcode/tree/LT104.java)
-* [LeetCode 111：二叉树叶子节点的最大深度。](https://github.com/StoneYunZhao/algorithm/blob/master/src/main/java/com/zhaoyun/leetcode/tree/LT111.java)
-
+* [LeetCode 104: Maximum Depth of Binary Tree](https://github.com/StoneYunZhao/algorithm/blob/master/src/main/java/com/zhaoyun/leetcode/tree/LT104.java)
+* [LeetCode 111: Minimum Depth of Binary Tree](https://github.com/StoneYunZhao/algorithm/blob/master/src/main/java/com/zhaoyun/leetcode/tree/LT111.java)

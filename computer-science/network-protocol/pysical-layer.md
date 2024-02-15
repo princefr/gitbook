@@ -1,20 +1,19 @@
-# Pysical Layer
+# Couche physique
 
 ## 8P8C
 
-也称 **RJ45**，是以太网使用双绞线连接时常用的一种连接器插头。8P8C（8 position 8 contact）的意思是8个位置（Position，指8个凹槽）、8个触点（Contact，指8个金属接点）。也就是平时说的水晶头。
+Également connu sous le nom de **RJ45**, c'est un connecteur de prise couramment utilisé lors de la connexion de câbles Ethernet à paires torsadées. 8P8C (8 positions 8 contacts) signifie qu'il y a 8 positions (Position, se référant à 8 encoches) et 8 contacts (Contact, se référant à 8 points de contact métalliques). C'est ce qu'on appelle généralement un connecteur modulaire ou "connecteur RJ45".
 
-在百兆以太网（Fast Ethernet、10/100M Ethernet）中，仅使用1、2、3、6这四根线。其中1、2为 TX \(发送\)，3、6 为 RX（接收）。
+Dans Ethernet 100 mégabits (Fast Ethernet, 10/100M Ethernet), seuls les fils 1, 2, 3 et 6 sont utilisés. Les fils 1 et 2 sont utilisés pour la transmission (TX), tandis que les fils 3 et 6 sont utilisés pour la réception (RX).
 
-若要通过水晶头直接连接两台电脑，在网卡不能自动适配发送、接收口时，需要做交叉线，即将一端的 1 号和 3 号线、2 号和 6 号线互换一下位置，就能够在物理层实现一端发送的信号，另一端能收到。
+Si l'on souhaite connecter directement deux ordinateurs à l'aide de connecteurs RJ45, et que les cartes réseau ne peuvent pas automatiquement s'adapter aux ports d'envoi et de réception, un câble croisé est nécessaire. Cela signifie qu'il faut échanger les positions des fils 1 et 3 d'un côté et les positions des fils 2 et 6 de l'autre côté. Cela permet de transmettre des signaux depuis une extrémité au niveau physique, et que l'autre extrémité puisse les recevoir.
 
-然后配置这两台电脑的 IP 地址、子网掩码和默认网关，这两台电脑就构成了最小的**局域网**（**Local Area Network，LAN**）。
+Ensuite, en configurant les adresses IP, les masques de sous-réseau et la passerelle par défaut de ces deux ordinateurs, ils forment le plus petit **réseau local** (**Local Area Network, LAN**).
 
-**局域网**（**Local Area Network\(LAN\)**），又称**内网，**是一个可连接住宅，学校，实验室，大学校园或办公大楼等有限区域内计算机的计算机网络。
+**Réseau local** (LAN), également appelé **intranet**, est un réseau informatique connectant des ordinateurs dans une zone limitée telle que des résidences, des écoles, des laboratoires, des campus universitaires ou des immeubles de bureaux.
 
 ## Hub
 
-**集线器**（Ethernet hub）是指将多条以太网双绞线或光纤集合连接在同一段物理介质下的设备。
+Un **concentrateur** (hub Ethernet) est un dispositif qui connecte plusieurs câbles Ethernet à paires torsadées ou à fibres optiques sur le même segment physique.
 
-完全运作在 OSI 模型中的物理层，可以让其链接的设备工作在同一网段。集线器上有多个 I/O 端口，信号从任意一个端口进入后，会从其他端口出现。它会将自己收到的收到的任何数字信号，经过再生或放大，复制到所有其他端口上去。
-
+Fonctionnant entièrement au niveau physique du modèle OSI, il permet à tous les périphériques connectés de travailler dans le même segment réseau. Un concentrateur dispose de plusieurs ports d'entrée/sortie (I/O), et les signaux entrant par l'un quelconque des ports sont répétés à tous les autres ports. Il régénère ou amplifie les signaux numériques qu'il reçoit et les copie sur tous les autres ports.

@@ -1,19 +1,18 @@
-# Divide and Conquer
+# Diviser pour régner
 
-分治算法，将原始问题划分成 n 个规模较小，并且结构与原问题相似的子问题，递归解决这些子问题，然后合并其结果，就得到原问题的解。
+L'algorithme de diviser pour régner consiste à diviser le problème original en n sous-problèmes de taille plus petite et structurellement similaires au problème original. Ensuite, on résout récursivement ces sous-problèmes, puis on combine leurs résultats pour obtenir la solution du problème original.
 
-分治算法与递归：分治算法是处理问题的一种思想，递归是一种编程技巧；分治算法一般都比较适合递归来实现。每一层递归都会涉及三种操作：分解、解决、合并。
+Diviser pour régner par rapport à la récursivité : Diviser pour régner est une approche de résolution de problèmes, tandis que la récursivité est une technique de programmation ; Diviser pour régner est généralement mieux mise en œuvre avec la récursivité. Chaque niveau de récursion implique généralement trois opérations : diviser, résoudre et combiner.
 
-适用条件：
+Conditions d'application :
 
-* 原问题与分解的小问题有相同的模式。
-* 原问题与子问题可以独立求解，没有相关性。
-* 分解有终止条件。
-* 合并操作的复杂度不能太高。
+- Le problème original et les sous-problèmes partagent un modèle similaire.
+- Le problème original et les sous-problèmes peuvent être résolus indépendamment, sans corrélation.
+- Il existe une condition d'arrêt pour la division.
+- La complexité de la fusion ne doit pas être trop élevée.
 
-[Map-Reduce](../distributed-system/computing.md#mr) 也是利用了分治的思想。
+[Map-Reduce](../distributed-system/computing.md#mr) utilise également le concept de diviser pour régner.
 
-## 例题
+## Exemple de problème
 
-* [LeetCode 50：求 x 的 n 次方。](https://github.com/StoneYunZhao/algorithm/blob/master/src/main/java/com/zhaoyun/leetcode/divide/LT50.java)
-
+- [LeetCode 50 : Calcul de la puissance de x à la puissance n.](https://github.com/StoneYunZhao/algorithm/blob/master/src/main/java/com/zhaoyun/leetcode/divide/LT50.java)

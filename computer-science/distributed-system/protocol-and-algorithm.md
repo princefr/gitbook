@@ -1,196 +1,176 @@
-# Protocol & Algorithm
+# Protocole et Algorithme
 
-## 大纲
+## Aperçu
 
-![](../../.gitbook/assets/image%20%28330%29.png)
+Pour un algorithme distribué, nous analysons généralement depuis les perspectives de la tolérance aux fautes byzantines, de la cohérence, des performances et de la disponibilité.
 
-对于一个分布式算法，我们常从拜占庭容错、一致性、性能、可用性四个角度来分析。
+### Tolérance aux Fautes Byzantines
 
-![](../../.gitbook/assets/image%20%28328%29.png)
+Décrivant un scénario non fiable où non seulement des pannes se produisent mais aussi des comportements malveillants.
 
-### 拜占庭容错
+La plupart des environnements (intranet d'entreprise) sont fiables, il suffit que le système ait une tolérance aux pannes.
 
-描述一个不可信场景，除了存在故障，还存在恶意行为。
+Dans un environnement non fiable, les algorithmes de tolérance aux fautes byzantines courants incluent POW, PBFT, etc.
 
-大部分环境（企业内网）是可信的，系统具有故障容错能力就行了。
+### Cohérence
 
-在不可信环境中，常见的拜占庭容错算法有 POW、PBFT 等。
+* **Cohérence Forte (Strong consistency) :** Une fois qu'une opération d'écriture est terminée, toutes les opérations de lecture ultérieures peuvent lire la valeur mise à jour. Cela inclut :
+  * La cohérence linéaire (Linearizability consistency), la cohérence atomique : Le "C" dans CAP fait référence à cela, comme les opérations d'écriture de ZK, les opérations de lecture/écriture d'etcd.
+  * Cohérence séquentielle (Sequential consistency) : Comme le système global de ZK (lecture+écriture).
+* **Cohérence Faible (Weak consistency) :** Une fois qu'une opération d'écriture est terminée, il n'y a aucune garantie que les opérations de lecture ultérieures obtiendront la valeur la plus récente. Cela inclut :
+  * Cohérence causale (Causal consistency)
+  * Cohérence éventuelle (Eventual consistency) : Si un objet n'a plus d'opérations d'écriture, toutes les opérations de lecture ultérieures obtiendront finalement la valeur la plus récente.
 
-### 一致性
-
-* 强一致性\(Strong consistency\)：写操作完成后，任何后续的读操作都能读到更新后的值。包括：
-  * 线性一致性\(Linearizability consistency\)、原子一致性：CAP 中的 C 即指这个，如 ZK 的写操作，etcd 的读写都是。
-  * 顺序一致性\(Sequential consistency\)：如 ZK 的整体（read+write）
-* 弱一致性\(Weak consistency\)：写操作完成后，不能保证后续读操作能读到最新的值。包括：
-  * 因果一致性\(Causal consistency\)
-  * 最终一致性\(Eventual consitency\)：若某个对象没有写操作了，最终所有后续的读操作都能读到最新的值。
-
-一致性的定义在不同理论中有不同的意义，很容易混淆，待补充。可以参考：
-
+La définition de la cohérence a des significations différentes dans différentes théories, ce qui peut être facilement confondu et nécessite une clarification. Vous pouvez consulter :
 * [http://kaiyuan.me/2018/04/21/consistency-concept/](http://kaiyuan.me/2018/04/21/consistency-concept/)
 * [https://segmentfault.com/a/1190000022248118](https://segmentfault.com/a/1190000022248118)
 
-### 可用性
+### Disponibilité
 
-Gossip 只有一个节点也能提供服务；Paxos、ZAB、Raft、Quorum NWR、PBFT、POW 能容忍一定数量的节点故障；2PC、TCC 只有所有节点都健康时才能运行。
+Gossip permet à un seul nœud de fournir un service ; Paxos, ZAB, Raft, Quorum NWR, PBFT, POW peuvent tolérer un certain nombre de pannes de nœuds ; 2PC, TCC ne peuvent fonctionner que lorsque tous les nœuds sont en bonne santé.
 
-### 性能
+### Performance
 
-Gossip 是 AP 系统，性能最高；Paxos、ZAB、Raft 都是领导者模型，写性能受限于领导者，读性能取决于一致性实现；2PC、TCC 需要预留和锁定资源，性能较低。
+Gossip est un système AP, offrant la meilleure performance ; Paxos, ZAB, Raft fonctionnent tous sur un modèle de leader, où les performances d'écriture sont limitées par le leader et les performances de lecture dépendent de la mise en œuvre de la cohérence ; 2PC, TCC nécessitent une réservation et un verrouillage des ressources, offrant des performances plus faibles.
 
-## 拜占庭将军问题
+## Problème des Généraux Byzantins
 
-描述的是最复杂的分布式故障场景，除了存在故障行为，还存在恶意行为。常用的算法有 PBFT 算法和 PoW 算法。
+Il décrit le scénario de panne distribuée le plus complexe, où non seulement des pannes se produisent mais aussi des comportements malveillants. Les algorithmes couramment utilisés sont l'algorithme PBFT et l'algorithme PoW.
 
-可以通过 2 忠 1 叛来举例。
+Un exemple est donné par le problème des 2 fidèles et 1 traître.
 
-### 口信消息型
+### Basé sur les Messages Oraux
 
-兰伯特论文中 [The Byzantine Generals Problem](https://www.microsoft.com/en-us/research/publication/byzantine-generals-problem/) 提到解法。
+Mentionné dans le document de Lamport [The Byzantine Generals Problem](https://www.microsoft.com/en-us/research/publication/byzantine-generals-problem/).
 
-算法前提：叛将人数 m 是已知的。而且需要 m+1 轮递归循环。
+Prérequis de l'algorithme : le nombre de traîtres m est connu. Et cela nécessite m+1 tours de récursion.
 
-算法结论：若叛将人数为 m，则总将军数不能少于 3m + 1。
+Conclusion de l'algorithme : si le nombre de traîtres est m, alors le nombre total de généraux ne peut pas être inférieur à 3m + 1.
 
-所以 2 忠 1 叛问题，必须再增加一名忠将才能解决。
+Donc, pour le problème des 2 fidèles et 1 traître, il est nécessaire d'ajouter un général fidèle supplémentaire pour résoudre le problème.
 
-### 签名消息型
+### Basé sur les Signatures des Messages
 
-消息特性：
+Caractéristiques des messages :
 
-* 消息无法伪造，且对消息的任何更改都能被发现。
-* 所有人都能验证消息的真伪。
+* Les messages ne peuvent pas être falsifiés, et toute modification des messages peut être détectée.
+* Tout le monde peut vérifier l'authenticité des messages.
 
-基于上述特性，兰伯特论文提到，任何伪造消息都能被发现，且无论多少忠将多少叛将，忠将总能达成一致的作战消息，即 n 位将军能容忍 n-2 位叛将。也需要 m+1 轮协商。此问题是解决忠将如何达成共识的问题，不关心共识是什么，比较理论化。
+Sur la base de ces caractéristiques, le document de Lamport indique que tout message falsifié peut être détecté, et que quel que soit le nombre de fidèles ou de traîtres, les généraux fidèles peuvent toujours parvenir à un consensus sur les messages de commandement, c'est-à-dire que n généraux peuvent tolérer n-2 traîtres. Cela nécessite également m+1 tours de négociation. Ce problème résout comment les généraux fidèles peuvent parvenir à un consensus, sans se soucier de ce que ce consensus représente, ce qui est plutôt théorique.
 
 {% hint style="info" %}
-消息签名一般通过非对称加密方式实现。比如 A 向 B 发送消息，A 存有私钥，B 存有公钥。A 把消息计算 hash 值\(MD5\)，再通过私钥加密，把消息和加密的 hash 都发送过去，B 通过公钥解密 hash，同时也计算消息的 hash，比较两个 hash 值即可。
+La signature des messages est généralement implémentée par cryptographie asymétrique. Par exemple, lorsque A envoie un message à B, A a une clé privée et B a une clé publique. A calcule la valeur de hachage (MD5) du message, puis l'encrypte avec sa clé privée, et envoie à la fois le message et le hachage chiffré. B déchiffre le hachage avec la clé publique, puis calcule également le hachage du message, comparant les deux hachages pour vérifier l'intégrité du message.
 {% endhint %}
 
-## CAP 理论
+## Théorie CAP
 
-对分布式系统特性做了高度抽象，即一致性、可用性、分区容错性，并对特性间的冲突做了总结，让我们在数据一致性（ACID）和服务可用性（BASE）之间权衡。
+Il abstrait les caractéristiques des systèmes distribués, à savoir la cohérence, la disponibilité et la tolérance aux partitions, et résume les conflits entre ces caractéristiques, nous permettant de peser entre la cohérence des données (ACID) et la disponibilité du service (BASE).
 
-### 一致性（Consistency）
+### Cohérence (Consistency)
 
-客户端每次读操作，不管访问哪个节点，要么读到的都是同一份最新写入的数据，要么失败。
+À chaque opération de lecture du client, quel que soit le nœud auquel il accède, il lit soit la même version des données la plus récente, soit échoue.
 
-可以认为是分布式系统对访问自己客户端的一种承诺：不管你访问我的哪个节点，我给你返回的是绝对一致的最新写入的数据，要么你读取失败。
+On peut considérer cela comme un engagement des systèmes distribués envers leurs clients : peu importe le nœud que vous accédez chez moi, je vous renvoie des données qui sont absolument cohérentes et les plus récemment écrites, sinon votre lecture échoue.
 
-### 可用性（Availability）
+### Disponibilité (Availability)
 
-客户端不管访问哪个非故障节点，都能得到响应数据，但不保证是同一份最新数据。
+Le client peut obten
+
+ir une réponse de n'importe quel nœud non en panne, mais il n'est pas garanti qu'il s'agisse de la même version des données les plus récentes.
 
 {% hint style="success" %}
-我认为是同时保证读写的可用性，如果仅保证读或写中的一者，那么既可以保证一者的 A 又可以保证 C。
+Je pense que cela garantit la disponibilité de la lecture et de l'écriture en même temps. Si seulement l'une des deux est garantie, alors on peut garantir à la fois C et A.
 {% endhint %}
 
-### 分区容错性（Partition Tolerance）
+### Tolérance aux Partitions (Partition Tolerance)
 
-当节点间出现任意数量的消息丢失或高延迟的时候，系统仍能继续工作。
+Lorsqu'il y a une perte de messages ou des délais élevés entre les nœuds, le système continue de fonctionner.
 
-分布式系统中分区容错性是必须支持的。
+La tolérance aux partitions est une exigence essentielle des systèmes distribués.
 
-### 分析
+### Analyse
 
-论文《[Brewer's conjecture and the feasibility of consistent, available, partition-tolerant web services](https://dl.acm.org/doi/10.1145/564585.564601)》证明三个指标不可兼得，只能选两个。注意论文中设定一致性定义为原子一致性。
+L'article "Brewer's conjecture and the feasibility of consistent, available, partition-tolerant web services" prouve que ces trois indicateurs ne peuvent pas être atteints simultanément, seulement deux peuvent être choisis. Notez que l'article définit la cohérence comme la cohérence atomique.
 
-* 当选择 CP 系统时，若系统节点间发生网络故障，为了不破坏一致性，系统可能无法响应客户端的读请求。
-* 当选择 AP 系统时，若系统节点间发生网络故障，系统将始终处理客户端的查询，只是一些节点无法返回最新数据。
-* CA 模型，舍弃了分布式，如单机版的 MySQL。
+* Lorsque vous choisissez un système CP, en cas de défaillance du réseau entre les nœuds, pour ne pas compromettre la cohérence, le système peut ne pas répondre aux requêtes de lecture du client.
+* Lorsque vous choisissez un système AP, en cas de défaillance du réseau entre les nœuds, le système continuera de répondre aux requêtes des clients, mais certains nœuds peuvent ne pas renvoyer les données les plus récentes.
+* Le modèle CA abandonne la distribution, comme une version autonome de MySQL.
 
 {% hint style="success" %}
-对于 CP 系统，我认为有办法保证读的 C、A。即当 P 发生时，让写操作失败，这样任何节点收到读请求都能响应\(保证 A\)，并返回最新的写入成功的数据\(保证 C\)。
+Pour les systèmes CP, je pense qu'il est possible de garantir à la fois la C et la A lorsqu'il n'y a pas de partition. Autrement dit, lorsque P se produit, l'opération d'écriture échoue, de sorte que tout nœud recevant une demande de lecture peut répondre (garantir A) et renvoyer les données écrites avec succès les plus récentes (garantir C).
 {% endhint %}
 
 {% hint style="warning" %}
-很多人对 CAP 有**误解**：无论在什么情况下，分布式系统只能在 C、A 中选一个。
+Beaucoup de gens ont **mal interprété** CAP : dans toutes les circonstances, les systèmes distribués ne peuvent choisir qu'entre C et A.
 
-当不存在网络分区时（系统大部分时间所处的状态），即不需要 P 时，C、A 能够同时保证。
+Lorsqu'il n'y a pas de partition réseau (état dans lequel se trouve le système la plupart du temps), C et A peuvent être simultanément garantis.
 {% endhint %}
 
-对于 InfluxDB 的集群版本，Meta 集群采用 CP 系统设计，Data 集群采用 AP 系统设计。
+Pour la version cluster d'InfluxDB, le cluster Meta adopte la conception du système CP, tandis que le cluster Data adopte la conception du système AP.
 
 {% hint style="info" %}
-* 可以把 ACID 理解为 CAP 理论中 CP 系统的对一致性的要求。
-* 可以把 BASE 理解为 CAP 理论中 AP 系统的延伸。
+* Vous pouvez considérer ACID comme l'exigence de cohérence dans les systèmes CP de la théorie CAP.
+* Vous pouvez considérer BASE comme une extension de la théorie CAP pour les systèmes AP.
 {% endhint %}
 
 ## ACID
 
-ACID 理论是对事务特性的抽象和总结。可以理解为无论是单机系统还是分布式系统，只要实现了操作的 ACID 特性，那么这个系统就实现了事务。
+La théorie ACID est une abstraction et une synthèse des caractéristiques des transactions. On peut comprendre que, qu'il s'agisse de systèmes autonomes ou distribués, dès lors que les propriétés ACID des opérations sont implémentées, alors ce système réalise des transactions.
 
-* Atomicity：原子性，进行数据处理操作的基本单位，不可分割。一个事务有多个操作，要不全部执行成功，要不全部没执行（涉及回滚操作）。
-* Consistency：一致性，数据库在进行事务操作后，会由原来的一致状态，变成另外一种一致状态。一致性一般由**业务定义**的。这里的 C 是强一致性，但是分布式系统中实现较难，所以出现了 BASE 理论。
-* Isolation：隔离性，事务不受其它事务影响。
-* Durability：持久性，事务提交之后对数据的修改是持久性的。
+* Atomicité : Les opérations de traitement des données sont des unités de base et ne peuvent pas être divisées. Une transaction a plusieurs opérations, soit elles sont toutes exécutées avec succès, soit aucune ne l'est (ce qui nécessite une opération de rollback).
+* Cohérence : Après des opérations de transaction, la base de données passe d'un état cohérent à un autre. La cohérence est généralement définie par l'**entreprise**. Le "C" ici est une cohérence forte, mais sa mise en œuvre dans les systèmes distribués est difficile, ce qui a conduit à l'émergence de la théorie BASE.
+* Isolation : Les transactions ne sont pas affectées par d'autres transactions.
+* Durabilité : Une fois qu'une transaction est validée, les modifications des données sont durables.
 
-单机事务的原理、实现等相关介绍见[ MySQL 一章](../../database/mysql/transaction.md)。分布式事务的实现、算法见[分布式事务一章](transcation.md)。
+Les principes, la mise en œuvre, etc. des transactions sur une seule machine sont décrits dans le chapitre MySQL. La mise en œuvre et les algorithmes des transactions distribuées sont décrits dans le chapitre des transactions distribuées.
 
 ## BASE
 
-CP 系统的可用性为系统中所有节点可用性的乘积，节点越多，可用性也就越低，所以尽量选用 AP 系统。
+La disponibilité d'un système CP est le produit de la disponibilité de tous les nœuds du système. Plus il y a de nœuds, moins le système est disponible, donc il vaut mieux choisir un système AP.
 
-BASE 理论是对 CAP 理论中一致性和可用性权衡的结果，是基于 CAP 演化而来，它的核心是**基本可用**（Basically Available）和**最终一致**（Eventually Consistent）。
-
-{% hint style="info" %}
-软状态（Soft State）描述的是实现服务可用性时数据的一种过渡状态，即不同节点间，数据副本存在短暂的不一致。
-{% endhint %}
-
-### 基本可用
-
-当分布式系统出现不可预知的故障时，允许损失部分功能的可用性，保障核心功能的可用性。
-
-基本可用的本质是妥协，通常实现基本可用的方式有：**流量削峰**、**延迟响应**、**体验降级**、**过载保护**。
-
-### 最终一致
-
-系统中所有的数据副本在经过一段时间的同步后，最终能达到一个一致的状态，即在数据一致上，有一个短暂的延迟。
-
-大部分互联网系统都采用最终一致，只有实在无法用最终一致时才会使用强一致，如觉得系统运行的敏感元数据采用强一致，支付或金融数据采用事务。
-
-可以把强一致理解为不存在延迟的最终一致。
-
-决定最终一致的数据准则一般有两种方式：
-
-* 最新写入的数据。
-* 第一次写入的数据。
-
-实现最终一致的方式一般有：
-
-* 读时修复：如 Cassandra 的 Read Repair。需要尽可能优化数据一致性对比算法。
-* 写时修复：如 Hinted-Handoff。不需要做数据对比，性能较好，优先使用这种方式。
-* 异步修复：定时对账检测。需要尽可能优化数据一致性对比算法。
+La théorie BASE est le résultat de l'équilibrage entre la cohérence des données (ACID) et la disponibilité du service (BASE) dans la théorie CAP. Elle est basée sur CAP et son cœur est la **disponibilité de base** (Basically Available) et la **cohérence finale** (Eventually Consistent).
 
 {% hint style="info" %}
-在实现最终一致时，推荐定义写的一致性级别，让用户自主选择， 如 All、Quorum、One、Any。
+L'état mou (Soft State) décrit un état de transition des données lors de la mise en œuvre de la disponibilité du service, où des répliques de données peuvent être momentanément incohérentes entre différents nœuds.
 {% endhint %}
 
-## Basic Paxos
+### Disponibilité de Base
 
-三种角色：
+En cas de pannes imprévisibles dans un système distribué, une partie de la fonctionnalité peut être perdue, mais la disponibilité de la fonctionnalité principale est garantie.
 
-* 提议者（Proposer）：集群中收到客户端请求的节点。
-* 接受者（Acceptor）：对每个提议的值进行投票，并存储接受的值。
-* 学习者（Learner）：被告知投票的结果，接受达成共识的值，存储保存。
+La disponibilité de base est essentiellement un compromis, et les méthodes courantes pour la réaliser incluent : **le lissage du trafic**, **la réponse retardée**, **la dégradation de l'expérience utilisateur**, **la protection contre la surcharge**.
 
-> 一般集群中的节点承担多个角色，如 proposer & acceptor。如 3 个节点的集群，节点 3 接受客户端的请求，作为 proposer，这个节点和另外两个节点一起作为 acceptor。
+### Cohérence Finale
 
+Toutes les répliques de données du système atteignent finalement un état cohérent après une période de synchronisation, c'est-à-dire qu'il y a un léger délai dans la cohérence des données.
 
+La plupart des systèmes Internet adoptent une cohérence finale, seuls des cas où la cohérence finale est insuffisante conduiront à l'utilisation de la cohérence forte, comme lorsque des métadonnées sensibles du système sont gérées avec une cohérence forte, ou lorsque des données de paiement ou financières sont gérées avec des transactions.
 
+Vous pouvez considérer la cohérence forte comme une cohérence finale sans délai.
 
+Les critères de décision pour la cohérence finale des données ont généralement deux méthodes :
 
+* Les données les plus récemment écrites.
+* Les données écrites pour la première fois.
 
+Les méthodes courantes pour implémenter la cohérence finale sont :
 
+* Réparation à la lecture : comme la réparation à la lecture de Cassandra. Il est nécessaire d'optimiser autant que possible
 
+ l'algorithme de comparaison de cohérence des données.
+* Réparation à l'écriture : comme le transfert d'indications. Il n'est pas nécessaire de comparer les données, ce qui améliore les performances, donc cette méthode est préférée.
+* Réparation asynchrone : vérification périodique des comptes. Il est nécessaire d'optimiser autant que possible l'algorithme de comparaison de cohérence des données.
 
+{% hint style="info" %}
+Lors de la mise en œuvre de la cohérence finale, il est recommandé de définir un niveau de cohérence d'écriture, afin de permettre aux utilisateurs de choisir, comme All, Quorum, One, Any.
+{% endhint %}
 
+## Paxos Basique
 
+Trois rôles :
 
+* Proposant (Proposer) : Le nœud du cluster qui reçoit les demandes des clients.
+* Acquéreur (Acceptor) : Il vote pour chaque proposition de valeur et stocke les valeurs acceptées.
+* Apprenant (Learner) : Informé du résultat du vote, il accepte les valeurs qui ont atteint un consensus et les stocke.
 
-
-
-
-
-
-
+> Généralement, les nœuds du cluster assument plusieurs rôles, comme proposant & acquéreur. Par exemple, dans un cluster de 3 nœuds, le nœud 3 accepte les demandes des clients, agissant en tant que proposant, et ce nœud ainsi que les deux autres nœuds agissent en tant qu'acquéreur.

@@ -1,139 +1,126 @@
-# Application layer
+# Couche application
 
 ## DHCP
 
-**动态主机设置协议**（**D**ynamic **H**ost **C**onfiguration **P**rotocol，**DHCP**）是一个局域网的网络协议，使用UDP协议工作，主要有两个用途：
+Le **Protocole de Configuration Dynamique des Hôtes** (**DHCP**, pour *Dynamic Host Configuration Protocol*) est un protocole réseau utilisé dans les réseaux locaux qui fonctionne avec le protocole UDP. Il a principalement deux objectifs :
 
-* 用于内部网或网络服务供应商自动分配 IP 地址给用户。
-* 用于内部网管理员作为对所有计算机作中央管理的手段。比如 PXE。
+- Attribution automatique des adresses IP aux utilisateurs dans un réseau interne ou par un fournisseur de services Internet.
+- Moyen pour les administrateurs de réseau interne de gérer de manière centralisée tous les ordinateurs, par exemple via PXE.
 
-DHCP 是 BOOTP 的增强版。
+Le DHCP est une amélioration de BOOTP.
 
-![](<../../.gitbook/assets/image (182).png>)
+### Découverte (*Discover*)
 
-### Discover
+Lorsqu'une nouvelle machine A rejoint le réseau, elle ne connaît que son adresse MAC. Elle doit donc diffuser une demande pour obtenir une adresse IP.
 
-当一台新机器 A 加入网络的时候，仅知道自己的 MAC 地址，所以需要广播请求 IP。
+|    En-tête    |                              Contenu                             |
+| :-----------: | :---------------------------------------------------------------: |
+| En-tête MAC   |      <p>MAC de A</p><p>Diffusion MAC (ff:ff:ff:ff:ff:ff)</p>      |
+| En-tête IP    | <p>IP de A : 0.0.0.0</p><p>Diffusion IP : 255.255.255.255</p>    |
+| En-tête UDP   |              <p>Port source : 68</p><p>Port destination : 67</p>              |
+| En-tête BOOTP |                         Boot request                        |
+|               |                      Voici mon adresse MAC, je n'ai pas encore d'IP                     |
 
-|    头    |                         内容                        |
-| :-----: | :-----------------------------------------------: |
-|  MAC 头  |  <p>A 的 MAC</p><p>广播的 MAC（ff:ff:ff:ff:ff:ff）</p>  |
-|   IP 头  | <p>A 的 IP：0.0.0.0</p><p>广播 IP：255.255.255.255</p> |
-|  UDP 头  |            <p>源端口：68</p><p>目标端口：67</p>            |
-| BOOTP 头 |                    Boot request                   |
-|         |                 我的 MAC 是这个，我还没有 IP                |
+### Offre (*Offer*)
 
-### Offer
+Le serveur DHCP reçoit cette demande et constate que la machine A n'a pas d'adresse IP, il lui attribue donc une adresse IP.
 
-DHCP 会收到这个请求，发现这机器 A 的 MAC 没有 IP 地址，所以租给它一个 IP。
+|    En-tête    |                                Contenu                               |
+| :-----------: | :------------------------------------------------------------------: |
+| En-tête MAC   |      <p>MAC du serveur DHCP</p><p>Diffusion MAC (ff:ff:ff:ff:ff:ff)</p>      |
+| En-tête IP    | <p>IP du serveur DHCP : 192.168.1.2</p><p>Diffusion IP : 255.255.255.255</p> |
+| En-tête UDP   |                  <p>Port source : 67</p><p>Port destination : 68</p>                  |
+| En-tête BOOTP |                           Boot reply (Réponse de boot)                          |
+|               |                Voici ton adresse MAC, je t'ai attribué cette adresse IP, que penses-tu ?               |
 
-|    头    |                                内容                               |
-| :-----: | :-------------------------------------------------------------: |
-|  MAC 头  |    <p>DHCP Server 的 MAC</p><p>广播的 MAC（ff:ff:ff:ff:ff:ff）</p>    |
-|   IP 头  | <p>DHCP Server 的 IP：192.168.1.2</p><p>广播 IP：255.255.255.255</p> |
-|  UDP 头  |                   <p>源端口：67</p><p>目标端口：68</p>                   |
-| BOOTP 头 |                            Boot reply                           |
-|         |                   这是你的 MAC 地址，我给你分配了这个 IP，你看如何                  |
+### Requête (*Request*)
 
-### Request
+La machine A peut recevoir des réponses de plusieurs serveurs DHCP, elle choisira généralement la première arrivée et enverra une demande DHCP en diffusion, contenant l'adresse MAC du client, l'adresse IP de la location acceptée, l'adresse du serveur DHCP qui a offert la location, et informera les autres serveurs DHCP qu'elle accepte cette offre et leur demande de retirer leurs offres.
 
-机器 A 可能收到多个 DHCP Server 的回复，它一般会选择最先到达的那个，并且会向网络发送一个 DHCP Request 广播数据包，包中包含客户端的 MAC 地址、接受的租约中的 IP 地址、提供此租约的 DHCP 服务器地址等，并告诉所有 DHCP Server 它将接受哪一台服务器提供的 IP 地址，告诉其他 DHCP 服务器撤销它们提供的 IP 地址。
+Comme la confirmation finale du serveur DHCP n'a pas encore été obtenue, le client utilise toujours 0.0.0.0 comme adresse IP source et 255.255.255.255 comme adresse de destination pour diffuser.
 
-由于还没有得到 DHCP Server 的最后确认，客户端仍然使用 0.0.0.0 为源 IP 地址、255.255.255.255 为目标地址进行广播。
+|    En-tête    |                              Contenu                             |
+| :-----------: | :---------------------------------------------------------------: |
+| En-tête MAC   |      <p>MAC de A</p><p>Diffusion MAC (ff:ff:ff:ff:ff:ff)</p>      |
+| En-tête IP    | <p>IP de A : 0.0.0.0</p><p>Diffusion IP : 255.255.255.255</p>    |
+| En-tête UDP   |              <p>Port source : 68</p><p>Port destination : 67</p>              |
+| En-tête BOOTP |                         Boot request                        |
+|               |            Voici mon adresse MAC, je veux louer cette adresse IP du serveur DHCP         |
 
-|    头    |                         内容                        |
-| :-----: | :-----------------------------------------------: |
-|  MAC 头  |  <p>A 的 MAC</p><p>广播的 MAC（ff:ff:ff:ff:ff:ff）</p>  |
-|   IP 头  | <p>A 的 IP：0.0.0.0</p><p>广播 IP：255.255.255.255</p> |
-|  UDP 头  |            <p>源端口：68</p><p>目标端口：67</p>            |
-| BOOTP 头 |                    Boot request                   |
-|         |      我的 MAC 是这个，我准备租用这个 DHCP Server 给我分配的 IP      |
+### Confirmation (*ACK*)
 
-### ACK
+Le serveur DHCP envoie un message de confirmation DHCP (*ACK*) au client.
 
-返回给客户机一个 DHCP ACK 消息包。
+|    En-tête    |                                Contenu                               |
+| :-----------: | :------------------------------------------------------------------: |
+| En-tête MAC   |      <p>MAC du serveur DHCP</p><p>Diffusion MAC (ff:ff:ff:ff:ff:ff)</p>      |
+| En-tête IP    | <p>IP du serveur DHCP : 192.168.1.2</p><p>Diffusion IP : 255.255.255.255</p> |
+| En-tête UDP   |                  <p>Port source : 67</p><p>Port destination : 68</p>                  |
+| En-tête BOOTP |                           Boot reply (Réponse de boot)                          |
+|               |                                  DHCP ACK (ACK DHCP)                                  |
 
-|    头    |                                内容                               |
-| :-----: | :-------------------------------------------------------------: |
-|  MAC 头  |    <p>DHCP Server 的 MAC</p><p>广播的 MAC（ff:ff:ff:ff:ff:ff）</p>    |
-|   IP 头  | <p>DHCP Server 的 IP：192.168.1.2</p><p>广播 IP：255.255.255.255</p> |
-|  UDP 头  |                   <p>源端口：67</p><p>目标端口：68</p>                   |
-| BOOTP 头 |                            Boot reply                           |
-|         |                             DHCP ACK                            |
+### Diffusion du client
 
-### 客户端广播
+Lorsque le bail est finalement conclu, une diffusion est encore nécessaire pour informer tout le monde.
 
-最终租约达成的时候，还是需要广播一下，让大家都知道。
+### Renouvellement et recyclage
 
-### 回收与续租
+Lorsque le bail arrive à expiration, l'administrateur doit récupérer l'IP.
 
-租期到了，管理员就要将IP收回。
-
-客户机会在租期过去 50% 的时候，直接向为其提供 IP 地址的 DHCP Server 发送 DHCP request 消息包。客户机接收到该服务器回应的 DHCP ACK 消息包，会根据包中所提供的新的租期以及其他已经更新的 TCP/IP 参数，更新自己的配置。这样，IP 租用更新就完成了。
+Le client enverra une demande DHCP au serveur DHCP pour renouveler le bail lorsque 50 % du bail est écoulé. Le client reçoit la réponse du serveur DHCP contenant un nouveau bail ainsi que d'autres paramètres TCP/IP mis à jour. Ainsi, la mise à jour de la location d'IP est effectuée.
 
 ## PXE
 
-DHCP 协议能给客户安装操作系统，这个在云计算领域大有用处。
-
-![](<../../.gitbook/assets/image (188).png>)
+Le protocole DHCP peut installer un système d'exploitation pour les clients, ce qui est très utile dans le domaine du cloud computing.
 
 ## HTTP
 
-HTTP 协议是浏览器与服务器之间的数据传送协议。本质是浏览器与服务器之间约定好的通讯格式。
+Le protocole HTTP est un protocole de transfert de données entre un navigateur et un serveur. Fondamentalement, il s'agit d'un format de communication convenu entre un navigateur et un serveur.
 
-HTTP 协议是基于 TCP 的，1.1 版本的 HTTP 模式开启了 Keep-Alive（Connection: keep-alive），可以在多次 HTTP 请求中复用一个 TCP 连接，不用每次都三次握手。
+Le protocole HTTP est basé sur TCP. La version 1.1 du mode HTTP active Keep-Alive (Connection
 
-![HTTP 请求报文格式](<../../.gitbook/assets/image (171).png>)
+: keep-alive), ce qui permet de réutiliser une connexion TCP pour plusieurs requêtes HTTP, sans avoir à refaire la procédure de connexion à chaque fois.
 
-* **方法**：GET、POST、PUT、DELETE、HEAD、PATCH 等
-* **版本**：1.0、1.1、2.0
-* 头部：
-  * Accept-Charset：客户端可以接受的字符集
-  * Content-Type：正文的格式
-  * **Cache-Control**：max-age 为 0，则不用缓存； 否则若资源缓存时间小于 max-age，则可以使用缓存。
-  * If-Modified-Since：若资源在某个时间之后没有更新，那么客户端就不用下载最新的资源了。
+![Format de requête HTTP](<../../.gitbook/assets/image (171).png>)
 
-![HTTP 响应报文格式](<../../.gitbook/assets/image (198).png>)
+- **Méthode** : GET, POST, PUT, DELETE, HEAD, PATCH, etc.
+- **Version** : 1.0, 1.1, 2.0
+- En-têtes :
+  - Accept-Charset : Jeu de caractères accepté par le client
+  - Content-Type : Format du corps du message
+  - **Cache-Control** : si max-age est à 0, alors pas de mise en cache ; sinon, si le temps de mise en cache des ressources est inférieur à max-age, elles peuvent être mises en cache.
+  - If-Modified-Since : si la ressource n'a pas été mise à jour depuis un certain temps, le client n'a pas besoin de télécharger la ressource la plus récente.
 
-HTTP 协议是无状态的，这样就会造成 Web 应用不知道这个请求来自哪里。
+![Format de réponse HTTP](<../../.gitbook/assets/image (198).png>)
+
+Le protocole HTTP est sans état, ce qui signifie que l'application Web ne sait pas d'où provient cette demande.
 
 ### Cookie
 
-Cookie 是 HTTP 报文的一个请求头，Web 应用可以将一些用户信息放在 cookie 中，用户的每次请求都带上 Cookie 头。**Cookie 的本质是一份存储在用户本地的文件，每次请求都带上这份信息。**
+Le cookie est un en-tête de requête HTTP. Les applications Web peuvent stocker des informations utilisateur dans les cookies, et chaque demande de l'utilisateur comprendra l'en-tête Cookie. **Les cookies sont essentiellement des fichiers stockés localement sur l'ordinateur de l'utilisateur, et ces informations sont envoyées à chaque demande.**
 
 ### Session
 
-Cookie 若明文带了用户信息，会有安全问题。所以服务端保存用户的状态，把 Session ID 返回给用户端，用户端每次请求都通过 Cookie 带上这个 Session ID。
+Si les informations utilisateur sont stockées en clair dans les cookies, cela pose des problèmes de sécurité. Par conséquent, le serveur conserve l'état de l'utilisateur, renvoie l'identifiant de session au client, et le client envoie cet identifiant de session dans chaque demande via un cookie.
 
 ## HTTPS
 
 ## DNS
 
-IP 不好记，所以有了域名。域名用“.”分隔的多个单词，最右边为“顶级域名”，然后是“二级域名”，往左依次降低。最左边通常用来表示主机用途，如 www 表示万维网，mail 表示邮件。所有域名都以 (.) 作为后缀，平时一般省略。DNS 服务器一般监听端口号 53。
+Les adresses IP sont difficiles à retenir, c'est pourquoi nous avons des noms de domaine. Les noms de domaine sont composés de plusieurs mots séparés par des points, avec le *domaine de premier niveau* à l'extrême droite, suivi du *domaine de deuxième niveau*, et ainsi de suite vers la gauche. Le plus à gauche est généralement utilisé pour indiquer l'utilisation de l'hôte, comme www pour le World Wide Web, ou mail pour le courrier électronique. Tous les noms de domaine se terminent par (.) mais cela est généralement omis. Les serveurs DNS écoutent généralement sur le port 53.
 
-DNS 负责把域名解析成 IP 地址，它的核心系统是一个三层树状、分布式服务：
+Le DNS est responsable de la résolution des noms de domaine en adresses IP. Son système central est un service distribué en forme d'arbre à trois niveaux :
 
-1. 根域名服务器（Root DNS Server）：负责顶级域名，如返回 com、cn、net 等顶级域名服务器的地址。目前全世界有 13 组根域名服务器，有数百台镜像。
-2. 顶级域名服务器（Top-level DNS Server）：负责各自域名下的权威域名服务器，如 com 顶级域名服务器返回 apple.com 的地址。
-3. 权威域名服务器（Authoritative DNS Server）：负责自己域名，如 apple.com权威域名服务器返回 www.apple.com 的地址。
+1. Serveur de noms de domaine racine (*Root DNS Server*) : responsable des domaines de premier niveau, tels que le retour des adresses des serveurs de domaine de premier niveau comme com, cn, net, etc. Actuellement, il existe 13 groupes de serveurs de noms de domaine racine, chacun avec des centaines de serveurs miroirs.
+2. Serveur de noms de domaine de premier niveau (*Top-level DNS Server*) : responsable des serveurs de noms de domaine d'autorité pour leurs propres domaines de premier niveau, comme le serveur de domaine de premier niveau com qui renvoie l'adresse de apple.com.
+3. Serveur de noms de domaine d'autorité (*Authoritative DNS Server*) : responsable de son propre domaine, comme le serveur de domaine d'autorité apple.com qui renvoie l'adresse de www.apple.com.
 
-核心 DNS 服务器不能服务全球网民，所以很多公司、网络运营商都有自己的 DNS 服务器，本质是缓存数据。操作系统也会对 DNS 的解析做缓存，另外/etc/hosts 可以自定义 DNS 记录。
+Les serveurs DNS centraux ne peuvent pas servir tous les internautes du monde entier, c'est pourquoi de nombreuses entreprises et fournisseurs de services Internet ont leurs propres serveurs DNS, qui sont essentiellement des caches de données. Les systèmes d'exploitation conservent également des caches pour la résolution DNS, et en plus de cela, /etc/hosts peut être utilisé pour personnaliser les enregistrements DNS.
 
-DNS 服务支持多种不同类型的记录：
+Les services DNS prennent en charge plusieurs types d'enregistrements :
 
-* A 记录：用于把域名转换成 IP 地址。
-* CNAME 记录：用于创建别名。
-* NS 记录：表示域名对应的域名服务器的地址。
+- Enregistrement A : utilisé pour convertir un nom de domaine en adresse IP.
+- Enregistrement CNAME : utilisé pour créer des alias.
+- Enregistrement NS : indique l'adresse du serveur de noms de domaine associé au domaine.
 
-可通过 /etc/resolve.conf 配置域名服务器，[nslookup、dig](../linux/diagnostic-tools.md#bind-utils) 查看域名。&#x20;
-
-域名的作用：
-
-1. 重定向，通过访问域名，可以做到对外服务不变，后端的 IP 地址可以任意改变。
-2. 负载均衡。
-
-优化：
-
-* 使用 DNS 缓存，比如 dnsmasq。
-* 对 DNS 解析的结果进行预取。这是浏览器等 Web 应用中最常用的方法，也就是说，不等用户点击页面上的超链接，浏览器就会在后台自动解析域名，并把结果缓存起来。
-* 使用 HTTPDNS 取代常规的 DNS 解析。域名劫持普遍存在，使用 HTTP 协议绕过链路中的 DNS 服务器，就可以避免域名劫持的问题。
+Vous pouvez configurer le serveur de noms de domaine dans /etc/resolve.conf, et utiliser des outils comme nslookup ou dig pour afficher les noms de domaine.

@@ -1,196 +1,192 @@
-# Hash Table
+# Table de hachage
 
-**定义**：散列表（Hash Table），利用数组随机访问的特性，通过散列函数（Hash函数）把元素的键值（key）映射为数组的下标（Hash 值），将数据存储在数组对应下标的位置。
+**Définition** : Une table de hachage, utilisant les caractéristiques d'accès aléatoire des tableaux, mappe les clés des éléments à des indices de tableau à l'aide d'une fonction de hachage, et stocke les données à la position correspondante du tableau.
 
-查询时间复杂度原理上是 O\(1\)，但是取决于散列函数、装载因子、散列冲突等。
+Le temps de recherche théorique est en O(1), mais dépend de la fonction de hachage, du facteur de charge, des collisions, etc.
 
-## 散列函数
+## Fonction de hachage
 
-**基本要求**：
+**Exigences de base** :
 
-1. 计算得到的值是非负整数
-2. 若 key1 = key2，则 hash\(key1\) = hash\(key2\)
-3. 若 key1 != key2，则 hash\(key1\) != hash\(key2\) // 几乎不可能实现，无法避免散列冲突
+1. Le résultat doit être un entier non négatif.
+2. Si key1 = key2, alors hash(key1) = hash(key2).
+3. Si key1 ≠ key2, alors hash(key1) ≠ hash(key2). // Presque impossible à réaliser, les collisions ne peuvent pas être évitées.
 
-**设计原则**：
+**Principes de conception** :
 
-* 不能太复杂，因为不能消耗过多的计算资源。
-* 生成的值要尽可能随机并且均匀分布。
+* Ne doit pas être trop complexe pour ne pas consommer trop de ressources de calcul.
+* La valeur générée doit être aussi aléatoire et uniformément distribuée que possible.
 
-**例子**：
+**Exemples** :
 
-* 数据分析法，比如手机号前面几位重复叫多，所以取后四位作为散列值。
-* 平方取中法
-* 随机数法
-* 折叠法
-* 直接寻址法
+* Méthode d'analyse des données : par exemple, les premiers chiffres des numéros de téléphone sont souvent répétés, donc les quatre derniers chiffres sont utilisés comme valeur de hachage.
+* Méthode du carré moyen.
+* Méthode des nombres aléatoires.
+* Méthode du pliage.
+* Méthode de recherche directe.
 
-## 哈希算法
+## Algorithme de hachage
 
-**定义**：将任意长度的二进制值串映射为固定长度的二进制串，这个映射规则就是哈希算法。映射之后得到的值就是哈希值。
+**Définition** : Un algorithme qui mappe une chaîne binaire de longueur arbitraire à une chaîne binaire de longueur fixe, appelée la valeur de hachage.
 
-哈希算法的**要求**：
+**Exigences de l'algorithme de hachage** :
 
-1. 从哈希值不能反推原始数据
-2. 对输入数据敏感，修改原始数据一个 bit，得到的 hash 值也大不相同
-3. 散列冲突的概率很小，但是不能完全避免（鸽巢原理）
-4. 执行效率要高，针对较长的文本，也能快速计算 hash 值
+1. On ne doit pas pouvoir retrouver les données d'origine à partir de la valeur de hachage.
+2. Sensible aux données d'entrée : modifier un seul bit des données d'origine doit produire une valeur de hachage complètement différente.
+3. La probabilité de collision doit être faible, mais ne peut pas être totalement évitée (principe des tiroirs).
+4. Haute efficacité d'exécution : doit pouvoir calculer rapidement la valeur de hachage même pour de longs textes.
 
-Hash 算法的**应用**：
+**Applications de l'algorithme de hachage** :
 
-* **安全加密**，MD5（Message Digest Algorithm），SHA（Secure Hash Algorithm）。第 1、3 点很重要。
-* **唯一标识**，在海量图库中搜索图片是否存在，每张图片取 hash 值，先比较 hash 值，再比较原始图片。
-* **数据校验**，BT 下载文件分割成很多块，每块计算 hash 值，保存在种子文件中，这样可以保证下载数据完整。
-* **散列函数**，注重第 4 点，第 1、3 点不太重要。
-* **负载均衡**，会话粘滞（session sticky）的实现，计算客户端的 IP 的 hash 值，对服务器数量取余。
-* **数据分片**，在第二个例子中，图片量巨大，一台机器无法存储，所以对图片计算 hash，然后对机器数取余，放入对应服务器。
-* **分布式存储**，海量数据单台机器无法存储，根据 hash 值存储在不同机器上。当数据量增加，需要增加服务器，那么需要重新计算 hash，搬迁到正确的机器。[一致性 hash 算法](../distributed-system/consistent-hashing.md#yi-zhi-xing-hash-suan-fa)，可以大量减少数据搬迁。
+* **Cryptage sécurisé**, MD5 (Message Digest Algorithm), SHA (Secure Hash Algorithm). Les points 1 et 3 sont très importants.
+* **Identifiant unique**, recherche d'images dans une grande bibliothèque, chaque image est hachée, puis les images originales sont comparées.
+* **Vérification des données**, division d'un fichier de téléchargement BT en plusieurs blocs, chaque bloc est haché et enregistré dans le fichier de semence pour garantir l'intégrité des données.
+* **Fonction de hachage**, met l'accent sur le point 4, les points 1 et 3 ne sont pas très importants.
+* **Équilibrage de charge**, implémentation de la session collante, en hachant l'adresse IP du client et en effectuant un modulo sur le nombre de serveurs.
 
-## 散列冲突
+## Collision de hachage
 
-散列函数的第三点要求几乎是不可能的，所以会存在散列冲突，解决方案有两种，**开放寻址法**（open addressing）和**链表法**（chaining）。
+La troisième exigence de la fonction de hachage est presque impossible à réaliser, donc des collisions de hachage peuvent se produire. Deux solutions sont couramment utilisées : le **probing ouvert** (open addressing) et la **chaining**.
 
-### **开放寻址法**
+### **Probing ouvert**
 
-出现散列冲突，则重新探测位置，将其插入。
+En cas de collision de hachage, la position est réexaminée et l'élément est inséré à cet endroit.
 
-不管使用哪种探测方法，当空闲位置较少时，冲突概率会大大增加。可通过装载因子（Load Factor）保证空闲比例。
+Quelle que soit la méthode de recherche utilisée, lorsque l'espace libre est faible, la probabilité de collision augmente considérablement. Ceci peut être contrôlé en ajustant le facteur de charge.
 
-**优点**：
+**Avantages** :
 
-* 数据都存在数组中，可有效利用 CPU 缓存加快查询速度。
-* 序列化简单。
+* Les données sont toutes stockées dans un tableau, ce qui permet une utilisation efficace du cache CPU pour accélérer les recherches.
+* La sérialisation est simple.
 
-**缺点**：
+**Inconvénients** :
 
-* 删除数据较麻烦，需要标记数据已删除。
-* 所有数据在数组中，冲突的代价更高
+* La suppression des données est plus compliquée, car elles doivent être marquées comme supprimées.
+* Toutes les données sont dans un tableau, ce qui rend les collisions plus coûteuses.
 
-**总结**：数据量较小、装载因子较小的时候，适合开放寻址。Java 的 ThreadLocalMap 使用的是开放寻址。
+**Résumé** : Approprié pour un petit nombre de données et un faible facteur de charge. La classe ThreadLocalMap de Java utilise le probing ouvert.
 
-#### **线性探测（Linear Probing）**
+#### **Probing linéaire (Linear Probing)**
 
-**插入**数据时若发现被占用，则依次往后找，直至有空闲位置。
+Lors de l'insertion de données, si la position est occupée, on continue de chercher jusqu'à trouver une position vide.
 
-**查找**数据时，先计算散列值找到对应位置，然后比较，若不相等，则往后找，若遇到空闲位置还没找到，说明数据不存在。
+Pour la recherche de données, on calcule d'abord la valeur de hachage pour trouver la position correspondante, puis on compare. Si elles ne correspondent pas, on continue de chercher jusqu'à trouver une position vide. Si on trouve une position vide avant de trouver la donnée, cela signifie que la donnée n'existe pas.
 
-**删除**数据时，不能直接把元素设置为空，因为查找会有问题，而应该标记为删除。
+Pour supprimer des données, il ne suffit pas de les définir sur null, car cela poserait problème lors de la recherche. Les données doivent donc être marquées comme supprimées.
 
-问题较大，当数据较多时，冲突更多，时间复杂度降为 O\(n\)。
+Ce procédé est problématique, car plus les données sont nombreuses, plus il y a de collisions, et la complexité temporelle devient O(n).
 
-#### **二次探测（Quadratic Probing）**
+#### **Probing quadratique (Quadratic Probing)**
 
-二次探测步长为 hash\(key\) + 0, hash\(key\) + 1 ^ 2, hash\(key\) + 2 ^ 2, …….
+La longueur du pas de recherche est hash(key) + 0, hash(key) + 1 ^ 2, hash(key) + 2 ^ 2, ……
 
-#### **双重散列（Double Hashing）**
+#### **Double hachage (Double Hashing)**
 
-双重散列使用一组散列函数，hash1\(key\), hash2\(key\), hash3\(key\), ......
+Le double hachage utilise un ensemble de fonctions de hachage : hash1(key), hash2(key), hash3(key), ......
 
-### **链表法**
+### **Chaining**
 
-散列表中每个桶（bucket）或槽（slot）会对应一个列表，散列值相同的元素放入相同槽位对应的列表中。
+Chaque seau ou emplacement de la table de hachage est associé à une liste, et les éléments ayant la même valeur de hachage sont placés dans la même liste.
 
-**优点**：
+**Avantages** :
 
-* 对内存利用率高，因为结点可以在需要时再创建。
-* 对装载因子的容忍度更高，即便装载因子为 10，也不会太慢。
+* Taux d'utilisation de la mémoire élevé, car les nœuds peuvent être créés à la demande.
+* Tolérance plus élevée au facteur de charge, même si le facteur de charge est de 10, cela ne ralentira pas trop.
 
-**缺点**：
+**Inconvénients** :
 
-* 需要存储指针，所以对于小对象，比较消耗内存。
-* 对 CPU 缓存不友好。
+* Nécessite le stockage des pointeurs, ce qui peut être coûteux en mémoire pour les petits objets.
+* Pas favorable au cache CPU.
 
-**总结**：比较适合存储大对象、大量数据的情况；更加灵活，支持更多优化策略，比如用红黑树替代链表。
+**Résumé** : Convient pour stocker de gros objets et de grandes quantités de données ; plus flexible, supporte plus de stratégies d'optimisation, comme le remplacement des listes par des arbres rouge-noir.
 
-## 装载因子
+## Facteur de charge
 
 ```text
-散列表的装载因子 = 填入表中的元素个数 / 散列表的长度
+Facteur de charge de la table de hachage = Nombre d
+
+'éléments dans la table / Longueur de la table de hachage
 ```
 
-当装载因子过大时，可**动态扩容**。散列表的动态扩容需要重新计算每个数据的存储位置。
+Lorsque le facteur de charge est trop élevé, le redimensionnement dynamique est possible. Le redimensionnement dynamique de la table de hachage nécessite de recalculer la position de stockage de chaque donnée.
 
-动态扩容的散列表的时间复杂度，摊还分析法，插入最好 O\(1\)，最坏 O\(n\)，平均 O\(1\)。
+Pour une table de hachage redimensionnée de manière dynamique, l'analyse d'amortissement montre que le temps d'insertion est O(1) au mieux, O(n) au pire, et O(1) en moyenne.
 
-动态扩容的散列表，删除较多数据后，空闲空间较多，需不需要缩容取决于数据。
+Pour une table de hachage redimensionnée dynamiquement, la décision de réduction dépend des données après la suppression.
 
-扩容的方式：
+Méthodes de redimensionnement :
 
-* 一次性扩容，当需要扩容时，全部搬迁数据。这样遇到某个插入操作就会很慢。
-* 分批扩容，当需要扩容时，仅申请空间。每次插入新数据，都插入到新的散列表，并将老的散列表拿一个数据放入新的散列表。查询时，需要查询新旧两个散列表。
+* Redimensionnement en une seule fois : lorsqu'un redimensionnement est nécessaire, toutes les données sont déplacées. Cela rend certaines opérations d'insertion très lentes.
+* Redimensionnement par lot : lorsqu'un redimensionnement est nécessaire, seulement de l'espace est alloué. Chaque fois qu'une nouvelle donnée est insérée, elle est insérée dans la nouvelle table de hachage, et une donnée est retirée de l'ancienne table de hachage. Lors de la recherche, les deux tables de hachage sont consultées.
 
-## 工业级散列表
+## Table de hachage industrielle
 
-Java 的 HashMap：
+HashMap de Java :
 
-* 默认初始大小 16，可以设置
-* 默认最大装载因子 0.75，扩容时会扩容两倍。
-* 散列冲突，采用链表法，JDK1.8 后，引入红黑树。链表超过默认 8 时，转换为红黑树。红黑树结点小于 8 时，转换为链表。
-* 散列函数
+* Taille initiale par défaut de 16, peut être ajustée.
+* Facteur de charge maximal par défaut de 0.75, la taille est doublée lors du redimensionnement.
+* Collision de hachage, utilise le chaining, depuis JDK1.8, introduit l'arbre rouge-noir. Si la liste dépasse 8 éléments, elle est convertie en arbre rouge-noir. Lorsque le nombre de nœuds de l'arbre rouge-noir est inférieur à 8, il est converti en liste.
 
 ```text
 int hash(Object key) {
     int h = key.hashCode()；
-    return (h ^ (h >>> 16)) & (capitity -1); //capicity 表示散列表的大小
+    return (h ^ (h >>> 16)) & (capacité -1); //capacité représente la taille de la table de hachage
 }
 ```
 
-## 散列表与数组结合
+## Combinaison de table de hachage et de tableau
 
-### **LRU缓存淘汰**
+### **LRU Cache**
 
-基于链表的 LRU 算法时间复杂度 O\(n\)（见[链表](list.md#list)）。结合散列表与双向链表时间复杂度可到 O\(1\)。
+L'algorithme LRU basé sur une liste a une complexité temporelle de O(n) (voir [Liste](list.md#list)). En combinant une table de hachage et une liste doublement liée, la complexité temporelle peut être réduite à O(1).
 
-![](../../.gitbook/assets/2.jpg)
+**Implémentation** : Chaque nœud contient quatre données : data pour stocker les données principales, prev et next pour la liste doublement liée, hnext pour la liste de hachage. Il est également nécessaire de maintenir un nœud de queue de liste doublement liée pour une suppression rapide de données.
 
-**实现：**每个结点有四个数据，data 存储主要数据，prev 和 next 用于双向链表中，hnext 用于散列表的列表中。还需维护一个双向链表的尾结点，用于快速删除数据。
+**Recherche** : Recherche via la table de hachage en O(1), une fois les données trouvées, elles sont déplacées vers le nœud de tête de la liste doublement liée.
 
-**查找：**通过散列表查找，时间复杂度 O\(1\)，查到数据后，移动到双向链表的头结点。
+**Suppression** : Recherche via la table de hachage en O(1) pour trouver le nœud à supprimer, puis suppression à la fois dans la liste de hachage et dans la liste doublement liée.
 
-**删除：**通过散列表 O\(1\) 查找到需要删除的结点，然后分别在散列表的链表和双向链表中删除。
+**Ajout** : Vérifier d'abord si l'élément existe ; s'il existe, le déplacer vers la tête de liste ; s'il n'existe pas et que la liste n'est pas pleine, l'ajouter en tête ; s'il n'existe pas et que la liste est pleine, supprimer d'abord le nœud de queue de la liste doublement liée, puis ajouter en tête.
 
-**添加：**首先确认是否存在，若存在，则移动到头结点；若不存在且没满，直接放入首部；若不存在且满，还需先删除双向链表的尾结点，再将数据放入首部。
+### **Ensemble ordonné de Redis**
 
-### **Redis有序集合**
+Dans un ensemble ordonné de Redis, chaque élément a deux attributs : clé et score.
 
-Redis 有序集合中元素有两个属性，key 和 score。
+Les API d'un ensemble ordonné Redis sont :
 
-Redis 有序集合的 API 有：
+1. Ajout
+2. Suppression par clé
+3. Recherche par clé
+4. Recherche par intervalle de score
+5. Tri par score
 
-1. 增加
-2. 按照 key 删除
-3. 按照 key 查找
-4. 按照 score 区间查找
-5. 按照 score 排序
+**Implémentation** : D'abord, un saut est construit en fonction du score, ce qui permet de réaliser rapidement les API 4 et 5. Ensuite, de manière similaire à LRU, une table de hachage est construite en fonction de la clé.
 
-**实现**：先按照 score 建立跳表，可以快速实现 API 4 和 5，然后与 LRU 类似，再按照 key 构建一个散列表。
-
-### **Java LinkedHashMap**
+### **LinkedHashMap de Java**
 
 ```text
-// 10 是初始大小，0.75 是装载因子，true 是表示按照访问时间排序
+// 10 est la taille initiale, 0.75 est le facteur de charge, true signifie qu'elle est triée par ordre d'accès
 HashMap<Integer, Integer> m = new LinkedHashMap<>(10, 0.75f, true);
 m.put(3, 11);
 m.put(1, 12);
 m.put(5, 23);
 m.put(2, 22);
 ​
-m.put(3, 26); // 会替换之前的 3，这个 3 会放到双向链表尾部
-m.get(5); // 访问 5 后，被访问到的数据会移动到链表尾部
+m.put(3, 26); // remplacera le précédent 3, ce 3 sera déplacé à la fin de la liste doublement liée
+m.get(5); // après l'accès à 5, les données accédées seront déplacées à la fin de la liste
 ​
 for (Map.Entry e : m.entrySet()) {
   System.out.println(e.getKey());
 }
 
-// output: 1 2 3 5
+// sortie : 1 2 3 5
 ```
 
-LinkedHashMap **按照访问时间排序**，Linked 表示的是双向链表。本质上，与 LRU 实现原理一样。
+LinkedHashMap est triée par ordre d'accès, le mot "Linked" signifie qu'elle utilise une liste doublement liée. Fondamentalement, c'est la même implémentation que LRU.
 
-## 例题
+## Problèmes d'exemple
 
-* [LeetCode 242：判断两个字符串是否由相同的字母构成。](https://github.com/StoneYunZhao/algorithm/blob/master/src/main/java/com/zhaoyun/leetcode/map/LT242.java)
-* [LeetCode 1：两数之和。](https://github.com/StoneYunZhao/algorithm/blob/master/src/main/java/com/zhaoyun/leetcode/map/LT01.java)
-* [LeetCode 15：三数之和。](https://github.com/StoneYunZhao/algorithm/blob/master/src/main/java/com/zhaoyun/leetcode/map/LT15.java)
-* [LeetCode 36：判断数独问题是否有效。](https://github.com/StoneYunZhao/algorithm/blob/master/src/main/java/com/zhaoyun/leetcode/map/LT36.java)
-
+* [LeetCode 242 : Vérifier si deux chaînes sont des anagrammes.](https://github.com/StoneYunZhao/algorithm/blob/master/src/main/java/com/zhaoyun/leetcode/map/LT242.java)
+* [LeetCode 1 : Deux sommes.](https://github.com/StoneYunZhao/algorithm/blob/master/src/main/java/com/zhaoyun/leetcode/map/LT01.java)
+* [LeetCode 15 : Trois sommes.](https://github.com/StoneYunZhao/algorithm/blob/master/src/main/java/com/zhaoyun/leetcode/map/LT15.java)
+* [LeetCode 36 : Vérifier la validité du problème du sudoku.](https://github.com/StoneYunZhao/algorithm/blob/master/src/main/java/com/zhaoyun/leetcode/map/LT36.java)

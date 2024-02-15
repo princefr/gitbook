@@ -1,21 +1,18 @@
-# HTTP
+HTTP (HyperText Transfer Protocol), Protocole de transfert hypertexte. C'est une convention et une spécification dans le monde de l'informatique spécialement conçue pour transférer des données hypertexte telles que du texte, des images, de l'audio, de la vidéo, etc., entre deux points.
 
-HTTP（HyperText Transfer Protocol），超文本传输协议。是一个在计算机世界里专门在两点之间传输文字、图片、音频、视频等超文本数据的约定和规范。
+* Protocole : Établit une norme de communication entre les ordinateurs, ainsi que diverses méthodes de contrôle et de gestion des erreurs associées.
+* Transfert : Utilisé pour transférer des données entre deux points, bidirectionnellement et avec la possibilité de "l'homme du milieu".
+* Hypertexte : Ne se limite pas au texte, peut inclure du texte, des images, de l'audio, de la vidéo, des liens hypertexte, etc., comme le HTML.
 
-* 协议：确立了一种计算机之间交流通信的规范，以及相关的各种控制和错误处理方式。
-* 传输：用来在两点之间传输数据，双向的，且可以有“中间人”的。
-* 超文本：不仅仅是文本，可以包含文字、图片、音频、视频、超链接等，如 HTML。
+HTTP/2 est basé sur le protocole SPDY de Google, HTTP/3 est basé sur le protocole QUIC de Google.
 
-HTTP/2 基于 Google 的 SPDY，HTTP/3 基于 Google 的 QUIC。
-
-* Web：World Wide Web
-* CDN：Content Delivery Network
-* 爬虫：Crawler
-* 君子协定：robots.txt
-* IP：Internet Protocol
-* TCP：Transmission Control Protocol
-* DNS：Domain Name System
-* URI：Uniform Resource Identifier
-* URL：Uniform Resource Locator，是 URI 的子集
-* SSL：Secure Socket Layer，3.0 时改名 TLS，Transport Layer Security。
-
+* Web : World Wide Web
+* CDN : Réseau de diffusion de contenu
+* Crawler : Robot d'indexation (ou "web crawler")
+* Gentlemen's agreement : robots.txt
+* IP : Protocole Internet
+* TCP : Protocole de contrôle de transmission
+* DNS : Système de noms de domaine
+* URI : Identifiant de ressource uniforme
+* URL : Localisateur de ressource uniforme, sous-ensemble de l'URI
+* SSL : Couche de sockets sécurisée, renommée TLS 3.0, Sécurité des couches de transport.

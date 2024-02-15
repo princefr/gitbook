@@ -1,58 +1,58 @@
-# Complexity
+# Complexité
 
-## 时间复杂度
+## Complexité temporelle
 
-代码的执行总时间`T(n)`与所有行代码的执行总次数`f(n)`成正比，即：
+Le temps total d'exécution du code `T(n)` est proportionnel au nombre total d'exécutions de toutes les lignes de code `f(n)`, c'est-à-dire :
 
 ```text
 T(n) = O(f(n))
 ```
 
-n 表示数据规模大小，O 表示正比例函数。
+Ici, n représente la taille de l'ensemble de données, et O représente une fonction proportionnelle.
 
-大 O 时间负复杂度并不代表代码真正执行时间，而是表示**代码执行时间随数据规模增长的变化趋势**，也叫**渐进时间复杂度**（asymptotic time complexity），简称**时间复杂度**。
+La complexité temporelle en notation Big O ne représente pas le temps réel d'exécution du code, mais plutôt la **tendance de variation du temps d'exécution du code avec l'augmentation de la taille des données**, également appelée **complexité temporelle asymptotique**. 
 
-当n很大时，`f(n)`中的低阶、常量、系数并不影响增长趋势，所以可以忽略，如`O(2n^2+2n+3)`可表示为`O(n^2)`。所以时间复杂度分析有一些实用技巧：
+Lorsque n est grand, les termes de faible ordre, les constantes et les coefficients dans f(n) n'affectent pas la tendance de croissance, ils peuvent donc être ignorés. Par exemple, O(2n^2+2n+3) peut être représenté comme O(n^2). Ainsi, l'analyse de la complexité temporelle comprend quelques techniques pratiques :
 
-1. 只关注循环次数最多的一行代码。
-2. 加法法则，总复杂度等于量级最大的复杂度。如，有两段先后执行的代码复杂度分别为`O(n)`与`O(n^2)`，那么总的复杂度为`O(n^2)`。
-3. 乘法法则，嵌套代码的复杂度等于嵌套内外代码复杂度的乘积。如，有两段嵌套的代码复杂度分别为`O(n)`与`O(n^2)`，那么总的复杂度为`O(n^3)`。
+1. Se concentrer uniquement sur la ligne de code avec le plus grand nombre d'itérations.
+2. Règle d'addition : la complexité totale est égale à la complexité du niveau le plus élevé. Par exemple, si deux segments de code ont des complexités respectives de O(n) et O(n^2) qui s'exécutent l'un après l'autre, alors la complexité totale est O(n^2).
+3. Règle de multiplication : la complexité d'un code imbriqué est le produit des complexités des codes intérieurs et extérieurs. Par exemple, si deux segments de code imbriqués ont des complexités respectives de O(n) et O(n^2), alors la complexité totale est O(n^3).
 
-几种常见的时间复杂度：
+Quelques complexités temporelles courantes :
 
 ```text
-# 多项式量级
-O(1) //常量阶
-O(logn) //对数阶
-O(n) //线性阶
-O(nlogn) //线性对数阶，如归并排序、快速排序
-O(n^2) //平方阶
-O(n^3) //立方阶
-O(n^k) //k次方阶
+# Ordres polynomiaux
+O(1) // Constante
+O(logn) // Logarithmique
+O(n) // Linéaire
+O(nlogn) // Linéaire-logarithmique, comme dans les tris fusion et rapide
+O(n^2) // Quadratique
+O(n^3) // Cubique
+O(n^k) // Puissance k
 ​
-# 非多项式量级
-O(2^n) //指数阶
-O(n!) //阶乘阶
+# Ordres non polynomiaux
+O(2^n) // Exponentiel
+O(n!) // Factoriel
 ```
 
-我们把非多项式量级的算法问题称为 **NP 问题**（Non-Deterministic Polynomial）。
+Les problèmes algorithmiques avec une complexité non polynomiale sont appelés **problèmes NP** (Non-Deterministic Polynomial).
 
-当一段代码的复杂度由两个数据规模来决定，并且不知道两个数据规模量级谁的大，那么复杂度对加法规则是： O\(f\(m\) + f\(n\)\) ，乘法规则是：O\(f\(m\) \* f\(n\)\) 。
+Lorsqu'un segment de code a une complexité déterminée par deux tailles de données et qu'on ne sait pas laquelle des deux est la plus grande, alors la complexité obéit à la règle d'addition : O\(f\(m\) + f\(n\)\), et à la règle de multiplication : O\(f\(m\) \* f\(n\)\).
 
-**不同情况下的复杂度**
+**Complexité dans différents cas**
 
-* 最好情况时间复杂度（best case time complexity）
-* 最坏情况时间复杂度（worst case time complexity）
-* 平均情况时间复杂度（average case time complexity）
+- Complexité dans le meilleur des cas (best case time complexity)
+- Complexité dans le pire des cas (worst case time complexity)
+- Complexité moyenne des cas (average case time complexity)
 
-同一代码块在不同情况下，时间复杂度**有量级差距**，我们就需要使用上述三种复杂度表示。比如下面代码，在数组中查找数据，最好 O\(1\)，最坏 O\(n\)，平均 O\(n\)。
+Pour un même bloc de code, la complexité temporelle peut **différer en fonction des situations**, nous devons donc utiliser les trois types de complexité mentionnés ci-dessus. Par exemple, dans le code suivant, lors de la recherche d'un élément dans un tableau, la complexité est de O(1) dans le meilleur des cas, de O(n) dans le pire des cas, et en moyenne de O(n).
 
 ```java
-int find(int[] array, int n, int x) {
+int trouver(int[] tableau, int n, int x) {
   int i = 0;
   int pos = -1;
   for (; i < n; ++i) {
-    if (array[i] == x) {
+    if (tableau[i] == x) {
        pos = i;
        break;
     }
@@ -61,15 +61,14 @@ int find(int[] array, int n, int x) {
 }
 ```
 
-**摊还分析**
+**Analyse d'amortissement**
 
-对一个数据结构进行连续操作，大部分情况时间复杂度很低，只有个别情况时间复杂度很高，而且这些操作之间存在前后关系，这时，可以将这组操作一起分析，看能否把时间复杂度较高的操作平摊到其它时间复杂度较低的操作。摊还分析得到的时间复杂度为**均摊时间复杂度**（amortized time complexity）。
+Lorsque vous effectuez des opérations continues sur une structure de données, dans la plupart des cas, la complexité temporelle est très faible, sauf dans quelques cas où elle est très élevée. De plus, ces opérations sont liées dans l'ordre, vous pouvez donc analyser ce groupe d'opérations ensemble pour voir si la complexité temporelle élevée peut être étalée sur les opérations à faible complexité temporelle. L'analyse d'amortissement donne alors une complexité temporelle appelée **complexité temporelle amortie** (amortized time complexity).
 
-本质上均摊时间复杂度是一种特殊的平均时间复杂度，一般两者相等。
+Fondamentalement, la complexité temporelle amortie est une forme spéciale de complexité temporelle moyenne, généralement, les deux sont égaux.
 
-## 空间复杂度
+## Complexité spatiale
 
-**渐进空间复杂度**（asymptotic space complexity）表示算法的**存储空间与数据规模之间的增长关系**。
+La complexité spatiale asymptotique représente la **relation de croissance entre l'espace de stockage de l'algorithme et la taille des données**.
 
-常用空间复杂度：`O(1)、O(n)、O(n^2)`。
-
+Quelques complexités spatiales courantes : `O(1)`, `O(n)`, `O(n^2)`.

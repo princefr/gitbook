@@ -1,58 +1,57 @@
 # Cache
 
-## 使用场景
+## Scénarios d'utilisation
 
-### 高性能
+### Haute performance
 
-若从数据库查询（复杂查询、跨表跨库查询）一个数据比较耗时，而且数据在短时间内不会变，那么可以把查询结果做缓存。
+Si une requête de base de données (requête complexe, requête sur plusieurs tables ou bases de données) prend beaucoup de temps, et que les données ne changent pas souvent dans un court laps de temps, il est possible de mettre en cache les résultats de la requête.
 
-由于缓存是内存，所以性能大大由于数据库。
+Étant donné que le cache est en mémoire, les performances sont nettement meilleures que celles de la base de données.
 
-### 高并发
+### Haute concurrence
 
-## 缺点
+## Inconvénients
 
-### 缓存与数据库双写不一致
+### Incohérence entre le cache et la base de données
 
-Cache Aside Pattern：
+Modèle Cache Aside :
 
-* 读，先读缓存，再读数据库。
-* 更新，先**删除**缓存，再更新数据库。选择删除而不是跟新缓存的原因：很多时候是经过复杂查询、计算后的结果，更新的话成本太大。其实使用的是 lazy 的思想。
+* Lecture : d'abord dans le cache, puis dans la base de données.
+* Mise à jour : d'abord **supprimer** le cache, puis mettre à jour la base de données. La raison de la suppression plutôt que de la mise à jour du cache est que le résultat est souvent le fruit de requêtes ou de calculs complexes, ce qui rend la mise à jour coûteuse. C'est en réalité une approche paresseuse (lazy).
 
-#### 情况一
+#### Scénario un
 
-**场景**：先修改数据库，再删除缓存，如果删除缓存失败了，那么会导致数据库中是新数据，缓存中是旧数据，数据出现不一致。
+**Situation** : modification de la base de données d'abord, puis suppression du cache. Si la suppression du cache échoue, la base de données contiendra de nouvelles données tandis que le cache contiendra les anciennes données, entraînant une incohérence des données.
 
-**解决方案**：先删除缓存，再修改数据库。
+**Solution** : supprimer d'abord le cache, puis modifier la base de données.
 
-#### 情况二
+#### Scénario deux
 
-**场景**：先删除缓存，然后去修改数据库，此时还没修改完成，一个请求过来，去读缓存，发现缓存空了，去查询数据库，查到了修改前的旧数据，放到了缓存中，此时数据变更的程序完成了数据库的修改。
+**Situation** : suppression du cache d'abord, puis tentative de modification de la base de données. À ce stade, la modification de la base de données n'est pas terminée. Une nouvelle requête arrive, recherche le cache, trouve qu'il est vide, accède à la base de données et récupère les anciennes données avant modification, qu'elle met dans le cache. Pendant ce temps, la modification de la base de données est finalisée.
 
-解决方案：
+Solution :
 
-### 缓存雪崩
+### Avalanche de cache
 
-缓存挂了，所有请求瞬时全部到数据库，导致数据库宕机。
+Si le cache tombe en panne, toutes les requêtes sont instantanément redirigées vers la base de données, entraînant un crash de la base de données.
 
-解决方案：
+Solutions :
 
-* 保证缓存高可用。
-* 系统内缓存，比如 ehcache。
-* 在请求数据库层做限流+降级。比如 Hystrix。
-* 缓存持久化，可以尽快恢复缓存。
+* Assurer une haute disponibilité du cache.
+* Cache interne au système, par exemple Ehcache.
+* Limiter et dégrader le trafic au niveau de la couche de base de données. Par exemple, Hystrix.
+* Persistance du cache pour une récupération rapide.
 
-### 缓存穿透
+### Perforation du cache
 
-由于不正确的请求（比如黑客攻击），所有的请求都命中不到缓存，导致全部请求到数据库。比如数据库中 id 为 1 -100，发出请求 id 为 -1。
+En raison de requêtes incorrectes (comme des attaques de pirates informatiques), toutes les requêtes ne peuvent pas accéder au cache, entraînant un accès direct à la base de données. Par exemple, une requête avec un ID de -1 alors que la base de données contient des IDs de 1 à 100.
 
-可以把数据库查不到的数据写一个空值到缓存里面去。
+Il est possible d'écrire une valeur nulle dans le cache pour les données non trouvées dans la base de données.
 
-### 缓存并发竞争
+### Concurrence dans le cache
 
-**场景**：多个服务同时对缓存中的某个 key 做更新，没有按照期望的顺序执行，所以最终的缓存数据不正确。
+**Situation** : plusieurs services mettent à jour simultanément une clé dans le cache, sans respecter l'ordre prévu, ce qui entraîne finalement des données de cache incorrectes.
 
-**解决方案**：分布式锁+时间戳。
+**Solution** : Verrouillage distribué + horodatage.
 
 ![](../../.gitbook/assets/01redis-bing-fa-jing-zheng-wen-ti-yi-ji-jie-jue-fang-an.png)
-

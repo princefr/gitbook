@@ -1,288 +1,277 @@
-# Tree
+# Arbre
 
-## 概念
+## Concepts
 
-**线性表结构**：栈、队列  
-**非线性表结构**：树、图
+**Structure linéaire** : Pile, file  
+**Structure non linéaire** : Arbre, graphe
 
-树（Tree）每个元素叫做**节点**，连线节点之间叫做**父子关系**。父节点指向子节点。拥有相同父节点的叫做**兄弟节点**。没有父节点的叫做**根节点**，没有子节点的叫做**叶子节点**或者**叶节点**。
+Chaque élément de l'arbre (Tree) est appelé **noeud**, et la connexion entre les noeuds est appelée **relation parent-enfant**. Un noeud parent pointe vers un noeud enfant. Ceux qui ont le même parent sont appelés **noeuds frères**. Celui qui n'a pas de parent est appelé **noeud racine**, et celui qui n'a pas d'enfant est appelé **noeud feuille**.
 
-**节点的高度**（Height）：节点到叶子节点的最长路径（边数）。  
-**节点的深度**（depth）：根节点到这个节点所经历的边的个数。  
-**节点的层数**（Level）：节点的深度+1。  
-**树的高度**：根节点的高度。
+**Hauteur du noeud** (Height) : La plus longue distance d'un noeud à un noeud feuille (en nombre de bords).  
+**Profondeur du noeud** (depth) : Le nombre de bords parcourus depuis le noeud racine jusqu'à ce noeud.  
+**Niveau du noeud** (Level) : La profondeur du noeud + 1.  
+**Hauteur de l'arbre** : La hauteur du noeud racine.
 
-**二叉树**：每个节点最多有两个子节点，分别为左子节点和右子节点。  
-**满二叉树**：叶子节点都在最底层，除了叶子节点，每个节点都有左右两个子节点。  
-**完全二叉树**：叶子节点都在最底下两层，最后一层的叶子节点都靠左排列，除了最后一层，其它层的节点个数都达到最大。完全二叉树用数组存储最节省内存。
+**Arbre binaire** : Chaque noeud a au plus deux noeuds enfants, appelés respectivement le fils gauche et le fils droit.  
+**Arbre binaire complet** : Tous les noeuds feuilles se trouvent au dernier niveau, chaque noeud (sauf les feuilles) a deux enfants.  
+**Arbre binaire parfait** : Tous les noeuds feuilles se trouvent aux deux derniers niveaux, les noeuds feuilles du dernier niveau sont disposés à gauche, et chaque niveau, sauf le dernier, a le nombre maximal de noeuds. Un arbre binaire parfait peut être stocké dans un tableau de manière très économique.
 
-**链式存储法**：每个节点有三个字段，数据和两个指针。  
-**顺序存储法**：数组存储，根节点存在下标`1`的位置，如果节点 X 存在下标为`i`的位置，则左子节点存在`2 * i`的位置，右子节点存在`2 * i + 1`的位置，父节点存储在`i / 2`的位置。完全二叉树仅仅浪费下标为 0 的位置，如果是非完全二叉树，则会浪费很多空间。
+**Méthode de stockage chaînée** : Chaque noeud a trois champs : données et deux pointeurs.  
+**Méthode de stockage séquentiel** : Stockage dans un tableau, le noeud racine est stocké à l'indice `1`, si le noeud X est à l'indice `i`, alors son fils gauche est à l'indice `2 * i`, son fils droit est à l'indice `2 * i + 1`, et son parent est stocké à l'indice `i / 2`. Un arbre binaire complet gaspille seulement la position `0`, mais un arbre non complet gaspille beaucoup d'espace.
 
-二叉树的遍历，时间复杂度`O(n)`：
+La traversée de l'arbre binaire a une complexité temporelle de `O(n)` :
 
-* 前序遍历，节点 -&gt; 左子树 -&gt; 右子树
-* 中序遍历，左子树 -&gt; 节点 -&gt; 右子树
-* 后序遍历，右子树 -&gt; 左子树 -&gt; 节点
+* Traversée préfixe : Noeud -> Sous-arbre gauche -> Sous-arbre droit
+* Traversée infixée : Sous-arbre gauche -> Noeud -> Sous-arbre droit
+* Traversée postfixée : Sous-arbre droit -> Sous-arbre gauche -> Noeud
 
-## 二叉查找树
+## Arbre binaire de recherche
 
-**二叉查找树**（binary search tree）：任意节点，左子树的每个节点都小于这个节点，右子树的每个节点都大于这个节点。
+Un **arbre binaire de recherche** (binary search tree) : Pour chaque noeud, tous les noeuds du sous-arbre gauche sont inférieurs à ce noeud, et tous les noeuds du sous-arbre droit sont supérieurs à ce noeud.
 
-* **查找：**先去根节点，若等于则返回，若比根节点小，则在左子树递归查找，若比根节点大则在右子树递归查找。
-* **插入：**插入的数据都在叶子节点，从根节点开始，若插入的数据比较大，且右子树为空，则插入到右子节点，若不为空，则递归遍历右子树，找到插入位置。插入数据比较小，类似往左子树插。
-* **删除：**若删除的节点没有子节点，则将删除节点的父节点指向 null；若删除的节点只有一个子节点，则将删除节点的父节点指向删除节点的子节点；若删除的节点有两个子节点，找到删除节点右子树的最小节点，与删除节点替换，再应用上两条规则删除原来最小节点的位置。也可以直接标记为已删除，但是不真正删除，只是浪费内存。
-* 查找最大节点。
-* 查找最小节点。
-* 查找前驱结点。
-* 查找后继结点。
-* 输出有序的数据序列，中序遍历即可，时间复杂度 O\(n\)，所以二叉查找树也叫二叉排序树。
+* **Recherche** : Commencez par le noeud racine, si c'est égal, retournez-le, si c'est plus petit, recherchez récursivement dans le sous-arbre gauche, si c'est plus grand, recherchez récursivement dans le sous-arbre droit.
+* **Insertion** : Les données insérées sont placées dans les noeuds feuilles. Commencez par le noeud racine, si les données à insérer sont plus grandes et que le sous-arbre droit est vide, insérez-les dans le noeud droit, sinon parcourez récursivement le sous-arbre droit pour trouver l'emplacement d'insertion. Pour les données plus petites, l'insertion est similaire mais du côté gauche.
+* **Suppression** : Si le noeud à supprimer n'a pas d'enfants, définissez le pointeur parent de ce noeud sur nul ; si le noeud à supprimer a un seul enfant, définissez le pointeur parent de ce noeud sur l'enfant de ce noeud ; si le noeud à supprimer a deux enfants, trouvez le plus petit noeud dans le sous-arbre droit du noeud à supprimer, remplacez le noeud à supprimer par ce plus petit noeud, puis appliquez les deux premières règles pour supprimer l'emplacement du plus petit noeud d'origine. Vous pouvez également le marquer comme supprimé mais ne pas le supprimer réellement pour économiser de la mémoire.
+* Recherche du noeud maximal.
+* Recherche du noeud minimal.
+* Recherche du prédécesseur.
+* Recherche du successeur.
+* Sortie de la séquence de données ordonnées, juste en faisant une traversée infixée, avec une complexité temporelle de O(n), c'est pourquoi l'arbre binaire de recherche est également appelé arbre binaire trié.
 
-实际中，在二叉查找树中存储的事对象，利用对象的某个字段作为键值来构建二叉查找树，对象的其它字段叫做**卫星数据**。
+En pratique, dans un arbre binaire de recherche, ce qui est stocké sont des objets, et un champ de l'objet est utilisé comme clé pour construire l'arbre binaire de recherche, les autres champs de l'objet sont appelés **données satellites**.
 
-**支持重复数据**的二叉查找树：
+**Arbre binaire de recherche avec données répétées** :
 
-* 通过链表或者支持动态扩容的数据等数据结构作为节点，把值相同的数据都存储在同一节点上。
-* 每个节点仍存储一个数据，插入数据时，若相同，则插入这个节点的右子树，即当做大于这个节点来处理；查找时，遇到值相同时，并不停止，继续在右子树查找，直到遇到叶子节点，把所有等于这个值得节点都查找出来；删除时，也是找到每个要删除的节点，依次删除。
+* En utilisant une liste chaînée ou une structure de données prenant en charge l'expansion dynamique comme noeud, stockez toutes les données ayant la même valeur dans le même noeud.
+* Chaque noeud stocke toujours une donnée, lors de l'insertion de données, si elles sont identiques, insérez-les dans le sous-arbre droit de ce noeud, les traitant comme plus grandes que ce noeud ; lors de la recherche, si vous rencontrez la même valeur, ne vous arrêtez pas, continuez à chercher dans le sous-arbre droit jusqu'à rencontrer un noeud feuille, et trouvez tous les noeuds ayant la même valeur que celle-ci ; lors de la suppression, trouvez chaque noeud à supprimer et supprimez-le séquentiellement.
 
-二叉查找树的**时间复杂度**：最坏`O(n)`，最好`O(height) = O(logn)`，平均`O(logn)`。
+La **complexité temporelle** de l'arbre binaire de recherche : pire cas `O(n)`, meilleur cas `O(hauteur) = O(logn)`, en moyenne `O(logn)`.
 
-**散列表与二叉查找树**：
+**Tableaux de hachage vs Arbres binaires de recherche** :
 
-* 散列表数据无序，若要输出有序数据，比较困难；二叉查找树中序遍历即可。
-* 散列表扩容时耗时很多，性能不稳定；平衡的二叉查找树性能稳定。
-* 尽管散列表查找为 O\(1\)，但因为有散列冲突的情况，不一定比 O\(logn\) 好。
-* 散列表的实现较复杂，要考虑散列函数的设计、冲突解决、扩容、缩容等。
-* 散列表表会浪费一定的空间。
+* Les données dans une table de hachage sont désordonnées, il est difficile de produire des données triées ; une traversée infixée d'un arbre binaire de recherche suffit.
+* L'extension d'une table de hachage prend beaucoup de temps et sa performance est instable ; l'arbre binaire de recherche équilibré a une performance stable.
+* Bien que la recherche dans une table de
 
-### 例题
+ hachage soit en O(1), en raison des collisions de hachage, ce n'est pas nécessairement mieux que O(logn).
+* L'implémentation d'une table de hachage est plus complexe, nécessitant la conception de la fonction de hachage, la résolution des collisions, l'extension et la réduction, etc.
+* Les tables de hachage gaspillent un certain espace.
 
-* [LeetCode 98：判断一颗树是否为二叉查找树。](https://github.com/StoneYunZhao/algorithm/blob/master/src/main/java/com/zhaoyun/leetcode/tree/LT98.java)
-* [LeetCode 235：二叉查找树的公共祖先。](https://github.com/StoneYunZhao/algorithm/blob/master/src/main/java/com/zhaoyun/leetcode/tree/LT235.java)
-* [LeetCode 236：二叉树的公共祖先。](https://github.com/StoneYunZhao/algorithm/blob/master/src/main/java/com/zhaoyun/leetcode/tree/LT236.java)
+### Exemples
 
-## 平衡二叉查找树
+* [LeetCode 98 : Vérifiez si un arbre est un arbre binaire de recherche.](https://github.com/StoneYunZhao/algorithm/blob/master/src/main/java/com/zhaoyun/leetcode/tree/LT98.java)
+* [LeetCode 235 : Ancêtre commun d'un arbre binaire de recherche.](https://github.com/StoneYunZhao/algorithm/blob/master/src/main/java/com/zhaoyun/leetcode/tree/LT235.java)
+* [LeetCode 236 : Ancêtre commun d'un arbre binaire.](https://github.com/StoneYunZhao/algorithm/blob/master/src/main/java/com/zhaoyun/leetcode/tree/LT236.java)
 
-为什么需要**平衡二叉查找树**？二叉查找树在理想情况下，插入、删除、查找操作的时间复杂度都是`O(logn)`，但是二叉查找树在频繁的动态跟新过程中，会出现退化情况，最差情况时，退化为链表。为了解决这个复杂度退化问题，所以需要平衡二叉查找树。
+## Arbre binaire de recherche équilibré
 
-**平衡二叉树**：二叉树中任意一个节点的左右子树的高度相差不能大于 1，完全二叉树、满二叉树都是平衡二叉树。
+Pourquoi avons-nous besoin d'un **arbre binaire de recherche équilibré** ? Dans le meilleur des cas, la complexité temporelle des opérations d'insertion, de suppression et de recherche dans un arbre binaire de recherche est de `O(logn)`, mais lorsqu'il est constamment mis à jour de manière dynamique, il peut se dégrader, dans le pire des cas, en une liste chaînée. Pour résoudre ce problème de dégradation de complexité, nous avons besoin d'un arbre binaire de recherche équilibré.
 
-**平衡二叉查找树**：满足平衡二叉树的二叉查找树。AVL 树、Treap（树堆）、Splay Tree（伸展树） 是严格的平衡二叉查找树。红黑树是不严格的。
+**Arbre binaire équilibré** : Dans un arbre binaire, la différence de hauteur entre les sous-arbres gauche et droit de chaque noeud ne peut pas être supérieure à 1. Les arbres binaires complets et les arbres binaires pleins sont des arbres binaires équilibrés.
 
-## **红黑树**
+**Arbre binaire de recherche équilibré** : Un arbre binaire de recherche qui est également équilibré. Les arbres AVL, les tréaps (heap trees), les arbres Splay sont des arbres binaires de recherche équilibrés stricts. Les arbres rouges-noirs ne le sont pas strictement.
 
-Read-Black Tree，简称 R-B Tree。**定义**：·
+## Arbre rouge-noir
 
-* 根节点是黑色；
-* 每个叶子节点都是黑色的空节点 NULL，不存储数据；
-* 任何相邻节点不能同时为红色；
-* 每个节点，从该节点到达其可达的叶子节点的所有路径，都包含相同数目的黑色节点。
+Arbre rouge-noir, abrégé en R-B Tree. **Définition** :
 
-如下图两个红黑树的例子（图中省略了黑色的空叶子节点）：
+* Le noeud racine est noir.
+* Chaque noeud feuille est un noeud NULL noir et ne stocke pas de données.
+* Aucun noeud rouge n'a deux noeuds rouges enfants adjacents.
+* Pour chaque noeud, tous les chemins de ce noeud à tous les noeuds feuilles ont le même nombre de noeuds noirs.
 
-![](../../.gitbook/assets/image%20%2826%29.png)
+Voici deux exemples d'arbres rouges-noirs (les noeuds noirs vides sont omis dans l'image) :
 
-红黑树的**时间性能分析**：
+![Exemple d'arbres rouges-noirs](../../.gitbook/assets/image%20%2826%29.png)
 
-* 二叉查找树的很多操作的时间复杂度都有树的高度成正比，所以只需要分析红黑树的高度。
-* 将红黑树的红色节点去掉，变成一颗四叉树。
-* 根据第四点定义，这颗四叉树高度比相同节点数的完全二叉树还小，即小于 log2n。
-* 把红色节点加回去，根据第 3 点定义，红黑树高度小于 2log2n。
+Analyse des performances temporelles des arbres rouges-noirs :
+
+* De nombreuses opérations sur un arbre binaire de recherche ont une complexité temporelle proportionnelle à la hauteur de l'arbre, donc nous avons juste besoin d'analyser la hauteur de l'arbre rouge-noir.
+* En supprimant les noeuds rouges de l'arbre rouge-noir, on obtient un arbre quaternaire.
+* Selon la quatrième règle, cet arbre quaternaire a une hauteur inférieure à un arbre binaire complet avec le même nombre de noeuds, c'est-à-dire moins que log2n.
+* En réintroduisant les noeuds rouges, selon la troisième règle, la hauteur de l'arbre rouge-noir est inférieure à 2log2n.
 
 {% hint style="info" %}
-红黑树来源于 2-3 树，可以通过 2-3 来理解红黑树的插入、删除操作。
+Les arbres rouges-noirs proviennent des arbres 2-3, et l'on peut comprendre les opérations d'insertion et de suppression des arbres rouges-noirs à partir des arbres 2-3.
 {% endhint %}
 
-## 递归树
+## Arbre Recursif
 
-### 递归
+### Récursivité
 
-可以用递归解决的问题满足三个条件：
+Un problème peut être résolu de manière récursive s'il satisfait aux trois conditions suivantes :
 
-1. 一个问题可以分解为几个子问题
-2. 这个问题与分解后的子问题，除了数据规模不一样，求解思路完全一样
-3. 存在递归终止条件
+1. Le problème peut être décomposé en plusieurs sous-problèmes.
+2. Le problème et ses sous-problèmes sont résolus de la même manière, à l'exception de la taille des données.
+3. Il existe une condition d'arrêt pour la récursivité.
 
-写递归代码的关键是写出递归公式，找到终止条件。
+La clé pour écrire du code récursif est de définir une formule récursive et de trouver la condition d'arrêt.
 
-人思维递归不应该试图想清楚整个递和归的过程。应该的做法：若问题 A 可分解为子问题 B、C、D，假设 B、C、D 已经解决，在此基础上思考如何解决 A，仅需思考 A 与 B、C、D 两层的关系即可，不需要一层一层往下思考。
+Lorsque vous pensez à la récursivité, il ne faut pas essayer de comprendre l'ensemble du processus récursif. La meilleure approche consiste à considérer le problème A comme pouvant être résolu en fonction des sous-problèmes B, C et D. Il suffit alors de réfléchir à la relation entre A et B, C, D sur deux niveaux, sans avoir besoin de descendre niveau par niveau.
 
-* 递归代码要警惕堆栈溢出，可限制递归最大深度来解决。
-* 递归要警惕重复计算，可以缓存已经计算的结果。
-* 递归会造成过多的函数调用，可以改成非递归来解决。
+* La récursivité doit être prudente pour éviter le débordement de pile. Limiter la profondeur maximale de récursion peut résoudre ce problème.
+* La récursivité doit être attentive aux calculs redondants. La mise en cache des résultats déjà calculés peut être utile.
+* La récursivité peut entraîner un grand nombre d'appels de fonction. Dans certains cas, il peut être préférable de les remplacer par des approches non récursives.
 
-**案例**：假如 n 个台阶，每次可以跨 1 或 2 个台阶，清楚 n 个台阶有多少种走法。递归公式：`f(n) = f(n-1) + f(n-2)`。终止条件：`f(1) = 1, f(2) = 2`
+**Exemple** : Supposons qu'il y ait n marches d'escalier, et à chaque étape, vous pouvez monter 1 ou 2 marches à la fois. Déterminez combien de façons différentes il y a de monter les n marches. Formule récursive : `f(n) = f(n-1) + f(n-2)`. Condition d'arrêt : `f(1) = 1, f(2) = 2`
 
-```text
-// 递归
-int f(int n) {
-  if (n == 1) return 1;
-  if (n == 2) return 2;
-  return f(n-1) + f(n-2);
-}
+```python
+# Récursif
+def f(n):
+    if n == 1:
+        return 1
+    if n == 2:
+        return 2
+    return f(n-1) + f(n-2)
 
-// 非递归
-int f(int n) {
-  if (n == 1) return 1;
-  if (n == 2) return 2;
-  
-  int ret = 0;
-  int pre = 2;
-  int prepre = 1;
-  for (int i = 3; i <= n; ++i) {
-    ret = pre + prepre;
-    prepre = pre;
-    pre = ret;
-  }
-  return ret;
-}
+# Non récursif
+def f(n):
+    if n == 1:
+        return 1
+    if n == 2:
+        return 2
+
+    ret = 0
+    pre = 2
+    prepre = 1
+    for i in range(3, n+1):
+        ret = pre + prepre
+        prepre = pre
+        pre = ret
+    return ret
 ```
 
-把递归的过程画成图，其实就是一颗树，叫做**递归树**。递归树可以用来求解时间复杂度。
+Le processus récursif peut être représenté sous forme de graphique, ce qui donne un **arbre récursif**. L'arbre récursif peut être utilisé pour déterminer la complexité temporelle.
 
-### 归并排序的时间复杂度
+### Complexité temporelle de la fusion
 
-![](../../.gitbook/assets/image%20%28242%29.png)
+![Arbre récursif de la fusion](../../.gitbook/assets/image%20%28242%29.png)
 
-归并排序主要有分解操作和合并操作。分解操作代价很低，合并操作耗时与数据规模有关，但是递归树中每一层的数据规模总和是一样的。设每一层耗时为 n，时间复杂度为 O\(h \* n\)，h 为树的高度。归并排序的递归树为满二叉树，高度为 log2n，所以归并排序的时间复杂度为 O\(nlogn\)。
+La fusion triée a principalement des opérations de division et de fusion. Les opérations de division ont un coût très faible, tandis que le coût de la fusion dépend de la taille des données, mais la somme des tailles de données dans chaque niveau de l'arbre récursif est la même. Supposons que chaque niveau coûte n, alors la complexité temporelle de la fusion triée est O(h * n), où h est la hauteur de l'arbre. L'arbre récursif de la fusion triée est un arbre binaire complet, donc sa hauteur est log2n, donc la complexité temporelle de la fusion triée est O(nlogn).
 
-### 快排的时间复杂度
+### Complexité temporelle de QuickSort
 
-![](../../.gitbook/assets/image%20%28167%29.png)
+![Arbre récursif de QuickSort](../../.gitbook/assets/image%20%28167%29.png)
 
-快速排序并不能保证每次分割都能等分，假设每次分割都是 1:9。每一层的分区操作所遍历的数据个数之和就是 n，所以只需要求出这颗递归树的高度，但是这棵树不是满二叉树。
+Le tri rapide ne garantit pas que chaque partition soit égale, supposons que chaque partition soit 1:9. La somme du nombre de données parcourues à chaque niveau d'arbre récursif est n, donc il suffit de calculer la hauteur de cet arbre récursif, mais cet arbre n'est pas un arbre binaire complet.
 
-从根节点 n 到叶子节点 1，最短路径每次都乘以 1/10，最长路径每次乘以 9/10，所以最短路径为 nlog10\(n\)，最长路径为 nlog10/9\(n\)，所以快排的时间复杂度为 O\(nlogn\)。
+Du nœud racine n au nœud feuille 1, le chemin le plus court est multiplié par 1/10 à chaque fois, le chemin le plus long est multiplié par 9/10 à chaque fois, donc le chemin le plus court est nlog10(n), le chemin le plus long est nlog10/9(n), donc la complexité temporelle de QuickSort est O(nlogn).
 
-### 斐波拉契数列的时间复杂度
+### Complexité temporelle de la suite de Fibonacci
 
-![](../../.gitbook/assets/image%20%2822%29.png)
+![Arbre récursif de la suite de Fibonacci](../../.gitbook/assets/image%20%2822%29.png)
 
-同理，根节点 n 到叶子节点的最长路径为 n，最短路径为 n/2。每一层的耗时为这一层节点的加法操作，所以第一层为 1，第二层为 2，第 n 层为 2^\(n-1\)。然后乘以路径，所以耗时为 O\(2^n\)。
+De manière similaire, du nœud racine n au nœud feuille 1, le chemin le plus long est n, le chemin le plus court est n/2. Le coût de chaque niveau est la somme des opérations d'addition pour les nœuds de ce niveau, donc le premier niveau est 1, le deuxième niveau est 2, le n-ème niveau est 2^(n-1). Ensuite, multipliez les chemins, donc le coût est O(2^n).
 
-### 全排列的时间复杂度
+### Complexité temporelle de la permutation complète
 
-一个数列的全排列，如果我们确定了最后一位，那么就剩下了 n - 1 个数据的全排列问题。代码为：
+La permutation complète d'une séquence de nombres, si nous fixons le dernier chiffre, il reste n - 1 problèmes de permutation. Le code est :
 
-```java
-// int[]a = a={1, 2, 3, 4}; printPermutations(a, 4, 4);
-public void printPermutations(int[] data, int n, int k) {
-  if (k == 1) {
-    for (int i = 0; i < n; ++i) {
-      System.out.print(data[i] + " ");
-    }
-    System.out.println();
-  }
-
-  for (int i = 0; i < k; ++i) {
-    int tmp = data[i];
-    data[i] = data[k-1];
-    data[k-1] = tmp;
-
-    printPermutations(data, n, k - 1);
-
-    tmp = data[i];
-    data[i] = data[k-1];
-    data[k-1] = tmp;
-  }
-}
+```python
+# a = a={1, 2, 3, 4}; printPermutations(a, 4, 4);
+def printPermutations(data, n, k):
+    if k == 1:
+        for i in range(n):
+            print(data[i], end=" ")
+        print()
+    
+    for i in range(k):
+        tmp = data[i]
+        data[i] = data[k-1]
+        data[k-1] = tmp
+        
+        printPermutations(data, n, k - 1)
+        
+        tmp = data[i]
+        data[i] = data[k-1]
+        data[k-1] = tmp
 ```
 
-如下递归树，第一层有 n 次交换操作，第二层有 n 个节点，每个节点有 n - 1 次交换，依次类推，时间复杂度为 O\(n!\)：
+L'arbre récursif ci-dessous montre que le premier niveau a n échanges, le deuxième niveau a n noeuds, chaque noeud a n - 1 échanges, et ainsi de suite. Donc, la complexité est O(n!).
 
-```text
-n + n*(n-1) + n*(n-1)*(n-2) +... + n*(n-1)*(n-2)*...*2*1 ≈ n!
+![Arbre récursif de la permutation complète](../../.gitbook/assets/image%20%28135%29.png)
+
+## Tas
+
+### Concepts
+
+Un tas est :
+
+* Un arbre binaire complet.
+* Chaque nœud du tas doit être supérieur ou égal (ou inférieur ou égal) à ses nœuds
+
+ enfants. Lorsque chaque nœud est supérieur ou égal, il s'agit d'un tas maximum ; lorsqu'il est inférieur ou égal, il s'agit d'un tas minimum.
+
+**Stockage de tas** : Comme un tas est un arbre binaire complet, le stocker dans un tableau est le plus efficace et économique en termes de mémoire.
+
+### Insertion
+
+Lors de l'insertion d'un élément, il est placé à la fin du tas, ce qui ne respecte pas la définition du tas. Nous devons donc ajuster le tas, ce processus est appelé **enfiler** (heapify).
+
+Après l'insertion, nous devons réaliser une heapification **de bas en haut**. Cela signifie que nous comparons le nœud inséré avec son parent, s'ils ne respectent pas la relation de tas, nous les échangeons, et nous répétons ce processus.
+
+```python
+class Heap:
+    def __init__(self, capacity):
+        self.a = [0] * (capacity + 1) # tableau, stockage des données à partir de l'indice 1
+        self.n = capacity # capacité maximale de stockage du tas
+        self.count = 0 # nombre de données actuellement stockées dans le tas
+
+    def insert(self, data):
+        if self.count >= self.n:
+            return # tas plein
+        self.count += 1
+        self.a[self.count] = data
+        i = self.count
+        while i // 2 > 0 and self.a[i] > self.a[i // 2]: # heapification de bas en haut
+            self.a[i], self.a[i // 2] = self.a[i // 2], self.a[i] # fonction d'échange
+            i = i // 2
 ```
 
-![](../../.gitbook/assets/image%20%28135%29.png)
+### Suppression de l'élément supérieur du tas
 
-## 堆
+Après la suppression de l'élément supérieur du tas, nous déplaçons le dernier élément à la racine, puis nous procédons à une heapification **de haut en bas**.
 
-### 概念
+```python
+def removeMax(self):
+    if self.count == 0:
+        return -1 # aucune donnée dans le tas
+    self.a[1] = self.a[self.count]
+    self.count -= 1
+    self.heapify(self.a, self.count, 1)
 
-堆（Heap）的**定义**：
-
-* 一颗完全二叉树。
-* 堆中的每个节点的值都必须大于等于（或小于等于）其左右子节点的值。大于等于的叫做**大顶堆**，小于等于的叫做**小顶堆**。
-
-**堆的存储**：由于堆是完全二叉树，所以用数组存储是最适合的，非常节约内存。
-
-### 插入
-
-先把插入的元素放到堆的最后，此时就不满足堆的定义了。我们就要进行调整，这个过程叫做**堆化**（heapify）。
-
-插入后，我们需要做**从下往上**堆化。就是让插入节点与父节点对比，若不满足大小关系，则交换，一直重复这个过程。
-
-![](../../.gitbook/assets/image%20%2876%29.png)
-
-```java
-public class Heap {
-  private int[] a; // 数组，从下标1开始存储数据
-  private int n;  // 堆可以存储的最大数据个数
-  private int count; // 堆中已经存储的数据个数
-
-  public Heap(int capacity) {
-    a = new int[capacity + 1];
-    n = capacity;
-    count = 0;
-  }
-
-  public void insert(int data) {
-    if (count >= n) return; // 堆满了
-    a[++count] = data;
-    int i = count;
-    while (i/2 > 0 && a[i] > a[i/2]) { // 自下往上堆化
-      swap(a, i, i/2); // swap()函数作用：交换下标为i和i/2的两个元素
-      i = i/2;
-    }
-  }
- }
-```
-
-### 删除堆顶元素
-
-删除堆顶元素后，把最后一个元素挪到堆顶，然后再进行从上往下堆化。
-
-![](../../.gitbook/assets/image%20%28258%29.png)
-
-```java
-public void removeMax() {
-  if (count == 0) return -1; // 堆中没有数据
-  a[1] = a[count--];
-  heapify(a, count, 1);
-}
-
-private void heapify(int[] a, int n, int i) { // 自上往下堆化
-  while (true) {
-    int maxPos = i;
-    if (i*2 <= n && a[i] < a[i*2]) maxPos = i*2;
-    if (i*2+1 <= n && a[maxPos] < a[i*2+1]) maxPos = i*2+1;
-    if (maxPos == i) break;
-    swap(a, i, maxPos);
-    i = maxPos;
-  }
-}
+def heapify(self, a, n, i): # heapification de haut en bas
+    while True:
+        maxPos = i
+        if i * 2 <= n and a[i] < a[i * 2]:
+            maxPos = i * 2
+        if i * 2 + 1 <= n and a[maxPos] < a[i * 2 + 1]:
+            maxPos = i * 2 + 1
+        if maxPos == i:
+            break
+        a[i], a[maxPos] = a[maxPos], a[i]
+        i = maxPos
 ```
 
 {% hint style="info" %}
-完全二叉树的高度不会超过 log2n，所以插入数据和删除堆顶元素的时间复杂度为 O\(logn\)。
+La hauteur d'un arbre binaire complet ne dépasse pas log2n, donc les opérations d'insertion et de suppression de l'élément supérieur du tas ont une complexité temporelle de O(logn).
 {% endhint %}
 
-### 堆排序
+### Tri par tas
 
-堆排序时间复杂度为 O\(nlogn\)，原地排序。有建堆和排序两个步骤。
+Le tri par tas a une complexité temporelle de O(nlogn) et est effectué sur place. Il comporte deux étapes : la construction du tas et le tri.
 
-#### 建堆
+#### Construction du tas
 
-建堆就是将数组原地建成一个堆。有两种思路。
+La construction du tas consiste à transformer un tableau en un tas. Il existe deux approches.
 
-**思路一**：类似插入排序，将数组分成两个部分，前半部分已经组成堆，然后依次把后半部分的数据插入堆中。是从前往后处理数据，从下往上堆化的过程。
+**Approche 1** : Similaire au tri par insertion, divisez le tableau en deux parties, la première moitié forme déjà un tas, puis insérez successivement les données de la deuxième moitié dans le tas. C'est un processus de bas en haut, où les données sont traitées de gauche à droite.
 
-**思路二**：是从后往前处理数据，从上往下的堆化的过程。叶子节点往下没有数据，所以直接从非叶子节点开始处理。
+**Approche 2** : Traitement des données de droite à gauche, c'est un processus de haut en bas. Comme les nœuds feuilles n'ont pas de données, nous commençons directement à partir des nœuds internes.
 
-![](../../.gitbook/assets/image%20%28213%29.png)
+![Construction du tas](../../.gitbook/assets/image%20%28213%29.png)
 
-![](../../.gitbook/assets/image%20%2816%29.png)
+![Construction du tas - Chemins de parcours](../../.gitbook/assets/image%20%2816%29.png)
 
 ```java
 private static void buildHeap(int[] a, int n) {
@@ -303,18 +292,17 @@ private static void heapify(int[] a, int n, int i) {
 }
 ```
 
-思路二建堆的时间复杂度为 O\(n\)。如下图，右边的每一项求和即可。
+La complexité temporelle de la construction du tas selon l'approche 2 est O(n). Comme illustré dans le graphique ci-dessous, chaque élément à droite de la ligne médiane est parcouru une fois.
 
-![](../../.gitbook/assets/image%20%2843%29.png)
+![Complexité temporelle de la construction du tas](../../.gitbook/assets/image%20%2843%29.png)
 
-#### 排序
+#### Tri
 
-以大顶堆为例，依次做上节的删除堆顶元素操作，得到的结果就是从小到大的排序数组。
+En prenant le tas maximum comme exemple, nous retirons successivement l'élément racine du tas pour obtenir un tableau trié par ordre croissant.
 
-![](../../.gitbook/assets/image%20%28200%29.png)
+![Tri par tas](../../.gitbook/assets/image%20%28200%29.png)
 
 ```java
-// n表示数据的个数，数组a中的数据从下标1到n的位置。
 public static void sort(int[] a, int n) {
   buildHeap(a, n);
   int k = n;
@@ -326,103 +314,99 @@ public static void sort(int[] a, int n) {
 }
 ```
 
-建堆为 O\(n\)，排序为 O\(nlogn\)，所以堆排序时间复杂度为 O\(nlogn\)。是原地排序，不是稳定排序，因为将最后一个元素与堆顶元素互换。
+La complexité temporelle de la construction du tas est O(n), tandis que celle du tri est O(nlogn), ce qui donne une complexité totale de O(nlogn) pour le tri par tas. Étant un tri sur place, il n'est pas stable car il échange les éléments, contrairement à un tri stable qui conserve l'ordre relatif des éléments égaux.
 
 {% hint style="warning" %}
-为什么快排比堆排序性能好？
+Pourquoi le tri rapide est-il plus performant que le tri par tas ?
 
-* 快排访问数组是连续的，堆排序是跳着访问的，所以快排堆 CPU 缓存更加友好。
-* 堆排序的交换次数大于快排。快排交换次数不会大于逆序度，但是堆排序建堆过程会打乱原有顺序，增加逆序度。
+- Le tri rapide accède aux données de manière continue dans le tableau, tandis que le tri par tas accède aux données de manière discontinue, ce qui rend le tri rapide plus favorable au cache CPU.
+- Le nombre d'échanges dans le tri par tas est supérieur à celui dans le tri rapide. Le nombre d'échanges dans le tri rapide est limité par l'inversion, tandis que la construction du tas dans le tri par tas peut perturber l'ordre initial, augmentant ainsi le nombre d'inversions.
 {% endhint %}
 
-### 堆的应用
+### Applications du tas
 
-#### 优先级队列
+#### File de priorité
 
-优先级队列中，数据的出队顺序不是先进先出，而是按照优先级来，优先级最高的最先出队。
+Dans une file de priorité, les éléments ne sont pas récupérés dans l'ordre dans lequel ils ont été insérés, mais dans un ordre déterminé par leur priorité.
 
-用堆实现优先级队列最直接，往优先级队列插入一个元素即往堆中插入一个元素。从队列中取出优先级最高的元素即从堆中取出堆顶元素。
+L'utilisation d'un tas pour implémenter une file de priorité est directe : chaque insertion dans la file de priorité équivaut à une insertion dans le tas. Pour obtenir l'élément de priorité maximale, il suffit de récupérer la racine du tas.
 
-优先级队列的应用非常广泛，这里举两个例子。
+Les files de priorité sont largement utilisées. En voici deux exemples :
 
-**合并有序小文件**
+**Fusion de petits fichiers triés**
 
-假设有 100 个小文件，每个 100MB，每个文件都是有序的，要求把这 100 个小文件合并成一个大文件。
+Supposons que vous ayez 100 petits fichiers, chacun de 100 Mo et triés, et que vous souhaitiez les fusionner en un seul gros fichier.
 
-思路类似归并排序的归并操作，从 100 个文件中都取出第一个元素组成大小为 100 的优先级队列，也就是堆。然后从堆中取出堆顶元素放入大文件中，再从堆顶元素对应的小文件中取出下一个元素插入堆中。循环这个过程，就合并成了一个大文件。
+L'idée est similaire à la fusion utilisée dans le tri fusion. À partir des 100 fichiers, vous prenez le premier élément de chaque fichier pour former une file de priorité, qui est également un tas. Ensuite, vous extrayez l'élément de priorité maximale (le plus petit dans ce cas) de la file de priorité et l'écrivez dans le fichier de sortie. Vous prenez ensuite le prochain élément dans le même fichier d'où provient l'élément que vous venez de retirer, l'insérez dans la file de priorité et répétez le processus jusqu'à ce que tous les fichiers soient vides.
 
-**高性能定时器**
+**Minimisation du temps de réponse élevé**
 
-假设有一个定时器，维护了很多定时任务，每个任务都有一个时间触发点。
+Imaginons un minuteur qui gère de nombreuses tâches planifiées, chaque tâche ayant un point de déclenchement dans le temps.
 
-* 简单的实现：定时器每隔一段小时间就扫描一遍任务，如果有任务到达了时间就执行。此方法有两点低效：每次要扫描所有任务；如果下个任务还要很久，那么就要做很多次无用的扫描。
-* 高效的实现：用优先级队列来解决，任务都放入优先级队列中，拿到堆顶的任务与当前时间比较，得到时间间隔 T，所以只需要直接 T 以后来执行堆顶任务就行；然后删除堆顶元素，与新的堆顶元素比较得到新的时间间隔。
+- Implémentation simple : Le minuteur parcourt toutes les tâches à intervalles réguliers. Si une tâche doit être déclenchée, elle est exécutée. Ce processus est inefficace car il doit parcourir toutes les tâches à chaque itération et peut effectuer de nombreux parcours inutiles si la prochaine tâche est loin.
+- Implémentation efficace : Utilisez une file de priorité pour stocker les tâches, chaque tâche étant une paire de son délai et de l'action à exécuter. À chaque itération, vérifiez la première tâche dans la file de priorité (celle avec le délai le plus court), attendez jusqu'à ce que le délai soit écoulé, puis exécutez l'action associée. Ensuite, retirez cette tâche de la file de priorité et continuez avec la prochaine tâche.
 
-#### 求 Top K
+#### Top K
 
-求 Top K 有两种类型，静态数据（数据集合不会再变）和动态数据（有数据动态加入集合中）。
+Trouver les K éléments les plus grands ou les plus petits dans un ensemble de données est un problème courant.
 
-* 静态数据：维护一个大小为 K 的小顶堆，遍历数据，往堆中插入元素，若比堆顶元素大，则删除堆顶元素，把这个元素插入堆中，遍历完成后，堆中的元素就是 Top K。
-* 动态数据：同样也是维护一个大小为 K 的小顶堆，当有数据添加进集合时，也对堆做比较操作。这样无论何时想要 Top K，只要返回堆中的数据即可。
+- Données statiques : Maintenez un tas de taille K. Parcourez les données et insérez-les dans le tas. Si le tas dépasse la taille K, retirez l'élément le plus petit. À la fin, le tas contiendra les K éléments les plus
 
-#### 求中位数
+ grands.
+- Données dynamiques : La même approche que pour les données statiques peut être utilisée. Chaque fois qu'une donnée est ajoutée, comparez-la à la racine du tas. Si elle est plus grande, remplacez la racine et rééquilibrez le tas.
 
-求动态数据中的中位数（处在中间位置的那个数）。
+#### Médiane
 
-维护两个堆，一个大顶堆，一个小顶堆。大顶堆存储前半部分数据，小顶堆存储后半部分数据，两个堆的堆顶就是中位数。
+Trouver la médiane d'un ensemble de données (l'élément au milieu une fois les données triées) peut également être résolu à l'aide d'un tas.
 
-关键是插入数据时怎么调整两个堆。如果小于大顶堆堆顶，则插入到大顶堆中；如果大于小顶堆堆顶，则插入小顶堆中。然后通过将一个堆的堆顶元素移至另一个堆来保持两个堆的大小均衡。
+Maintenez deux tas : un grand tas pour les éléments inférieurs à la médiane et un petit tas pour les éléments supérieurs à la médiane. Les deux tas garantissent que la médiane est toujours entre la racine des deux tas. Lorsqu'un nouvel élément est inséré, comparez-le avec la racine des deux tas pour décider dans lequel le placer. Ensuite, équilibrez les deux tas en déplaçant un élément d'un tas à l'autre si nécessaire.
 
 {% hint style="info" %}
-拓展一下，不仅可以求中位数，还能求任意百分位数据。比如接口 99% 响应时间。
+En extrapolant, non seulement la médiane peut être trouvée, mais n'importe quel pourcentage de données peut être calculé. Par exemple, le temps de réponse 99% dans une API.
 {% endhint %}
 
-## 并查集
+## Union-Find (Union-Find)
 
-Union-find Algorithm 是一种树形的数据结构，用于处理一些不交集（Disjoint Sets）的合并及查询问题。定义了两个操作：
+L'algorithme Union-Find est une structure arborescente de données utilisée pour résoudre des problèmes de fusion et de recherche sur des ensembles disjoint (Disjoint Sets). Il définit deux opérations :
 
-* **Union**：合并两个子集。**优化**：低 rank 合并到高 rank；但是需要记录 rank，一般用下面的优化就可以了。
-* **Find**：确定元素属于哪一个子集，可用于确认两个元素是否属于同一子集。**优化**：路径压缩，在 find 时，把路径上所有的节点都直接指向 root。
+- **Union** : Fusionner deux sous-ensembles. **Optimisation** : Fusionner le sous-ensemble de plus faible rang dans celui de plus haut rang ; cependant, il suffit généralement d'utiliser l'optimisation de chemin ci-dessous.
+- **Find** : Déterminer à quel sous-ensemble appartient un élément, peut être utilisé pour vérifier si deux éléments appartiennent au même sous-ensemble. **Optimisation** : Compression de chemin, lors de la recherche, tous les nœuds sur le chemin sont directement liés à la racine.
 
-例题：
+Exemples :
 
-* LeetCode 200：岛屿数量。
-* LeetCode 547：朋友圈个数。
+- LeetCode 200 : Nombre d'îles.
+- LeetCode 547 : Nombre de cercles d'amis.
 
-## B 树
+## Arbre B
 
-二叉树的搜索效率最高，但是高度较高，并且索引不止在内存中，还要写到磁盘上，每次读取节点都是一次磁盘操作，因此很多数据库不使用二叉树。为了减少磁盘的读取次数，所以应该使用 N 叉树，以 InnoDB 为例，N 大约为 1200。
+L'efficacité de recherche la plus élevée est obtenue avec un arbre binaire, mais il a une hauteur plus élevée et l'indexation ne se fait pas uniquement en mémoire, mais également sur disque, ce qui rend de nombreux systèmes de base de données peu pratiques. Pour réduire le nombre de lectures de disque, N arbres doivent être utilisés, comme environ 1200 pour InnoDB.
 
-B 树英文叫做 Balance Tree，也叫平衡多路搜索树，它的高度远小于平衡二叉树的高度。在文件系统和数据库系统中常采用 B 树实现索引结构。
+Un arbre B \(Balance Tree\) est un arbre de recherche multi-voies équilibré, dont la hauteur est bien inférieure à celle d'un arbre binaire équilibré. Il est largement utilisé dans les systèmes de fichiers et les systèmes de base de données pour implémenter des structures d'index.
 
-![](../../.gitbook/assets/image%20%281%29.png)
+Un arbre B de commande M \(M &gt; 2\) peut contenir au maximum M enfants par nœud et présente les caractéristiques suivantes :
 
-一个 M\(M &gt; 2\) 阶的 B 树每个节点最多可以包含 M 个子节点，有如下特性：
+- Le nombre d'enfants du nœud racine est compris entre \[2, M\].
+- Les nœuds internes ont k - 1 clés et k enfants, avec k dans la plage \[ceil\(M / 2\), M\].
+- Les feuilles ont k - 1 clés, avec k dans la plage \[ceil\(M / 2\), M\].
+- Les clés des nœuds internes sont stockées dans l'ordre et les k enfants pointent vers les k plages séparées par les clés.
+- Toutes les feuilles se trouvent sur la même couche.
 
-* 根节点的儿子数为 \[2, M\]。
-* 中间节点有 k - 1 个关键字和 k 个孩子，k 的范围 \[ceil\(M / 2\), M\]。
-* 叶子节点有 k - 1 个关键字，k 的范围 \[ceil\(M / 2\), M\]。
-* 中间节点的 k - 1 关键字按照顺序存放，k 个孩子指向关键字分割的 k 个范围。
-* 所有叶子节点位于同一层。
+## Arbre B+
 
-## B+ 树
+L'arbre B+ \(B more\) est une amélioration de l'arbre B, largement utilisé dans les systèmes de bases de données comme [MySQL](../../database/mysql/indexing.md#2-mysql-suo-yin). Les améliorations apportées par l'arbre B+ sont les suivantes :
 
-B+\(B more\) 树是基于 B 树做的改进，主流的 DBMS 都支持 B+ 树，如 [MySQL](../../database/mysql/indexing.md#2-mysql-suo-yin)。B+ 树的改进点如下：
+- L'arbre des clés = l'arbre des enfants.
+- Les clés des nœuds internes sont également stockées dans les nœuds enfants, la plus grande (ou la plus petite) clé étant dans les nœuds enfants.
+- Les nœuds internes ne stockent que les clés, pas les données, qui sont stockées dans les nœuds feuilles.
+- Les nœuds feuilles contiennent toutes les clés et forment une liste liée ordonnée entre eux, les nœuds feuilles internes sont également ordonnés.
 
-* 关键字树 = 孩子树。
-* 非叶子节点的关键字也会存于子节点中，并且在子节点关键字中最大（或最小）。
-* 非叶子节点仅保存关键字，不保存数据，数据存放在叶子节点中。
-* 叶子节点有所有关键字，并且叶子节点之间构成一个有序链表，叶子节点内部也有序。
+Avec ces améliorations, les avantages de l'arbre B+ sont les suivants :
 
-![](../../.gitbook/assets/image%20%28251%29.png)
+- L'efficacité de recherche de l'arbre B+ est plus stable car les données doivent toujours être accédées via les nœuds feuilles.
+- Les nœuds internes de l'arbre B+ ne stockent pas de données, de sorte que la même taille de page disque peut stocker plus de clés, ce qui rend l'arbre plus court et plus large, réduisant ainsi le nombre de lectures de disque I/O.
+- L'efficacité de la requête par plage est beaucoup plus élevée avec l'arbre B+.
 
-有了上述改进点，B+ 树有如下好处：
-
-* B+ 树查询效率更加稳定，因为每次都必须访问到叶子节点才能找到数据；而 B 树非叶子节点也存储数据，所以可能很快就找到。
-* B+ 树非叶子节点不存储数据，同样大小的磁盘页可以存储更多的关键字，所以更加矮胖，磁盘 IO 次数更少。
-* B+ 树的范围查询效率要高很多。
-
-假设有如下表和数据，则 InnoDB 的索引结构为下图：
+Supposons que nous ayons la table et les données suivantes, l'index InnoDB est illustré dans le diagramme ci-dessous :
 
 ```sql
 mysql> create table T(
@@ -434,18 +418,20 @@ index (k))engine=InnoDB;
 (100,1) (200,2) (300,3) (500,5) (600,6)
 ```
 
-![](../../.gitbook/assets/image%20%28170%29.png)
+![Structure d'index d'InnoDB](../../.gitbook/assets/image%20%28170%29.png)
 
-* **主键索引**：又叫聚簇索引（clustered index），叶子节点存整行数据。
-* **非主键索引**：又叫耳机索引（secondary index），叶子节点存主键的值。
+- **Index primaire** : Aussi appelé index regroupé (clustered index), les nœuds feuilles contiennent des données complètes de lignes.
+- **Index secondaire** : Aussi appelé index non regroupé (secondary index), les nœuds feuilles contiennent uniquement les valeurs des clés primaires.
 
-若使用`select * from T where k=5`，则先搜索 k 索引树，得到 ID 再去主键索引树搜索，这称为**回表**。
+Si une requête est lancée `select * from T where k=5`, elle recherche d'abord dans l'arbre indexé par k, puis récupère l'ID pour rechercher dans l'arbre indexé par ID, ce qui nécessite un **retrour à la source**.
 
-#### 页分裂
+#### Division de la page
 
-当插入数据时，比如插入 700，则只需在后面追加一条记录。若插入 400，需要逻辑上移动后面的数据。若插入的页已经满了，B+ 树会申请一个新的页，然后挪动部分数据过去。
+Lors de l'insertion de données, par exemple, l'insertion de 700, seule une nouvelle entrée est ajoutée à la fin. Si 400 est inséré, il faut déplacer les données suivantes logiquement. Si la page à insérer
 
-#### 页合并
+ est pleine, un nouvelle page est allouée, et une partie des données est déplacée vers la nouvelle page.
 
-若相邻两个页由于删除数据，空间利用率很低，则会把数据页合并。
+#### Fusion de la page
+
+Si deux pages adjacentes ont un taux d'occupation très faible en raison de suppressions de données, elles peuvent être fusionnées.
 

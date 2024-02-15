@@ -1,32 +1,31 @@
-# Greedy Algorithm
+# Algorithme glouton
 
-## 介绍
+## Introduction
 
-贪心算法有很多经典应用，如霍夫曼编码（Huffman Coding）、Prim 和 Kruskal 最小生成树算法、Dijkstra 单源最短路径算法。
+L'algorithme glouton a de nombreuses applications classiques, telles que le codage de Huffman (Huffman Coding), les algorithmes de l'arbre couvrant minimal de Prim et de Kruskal, et l'algorithme de plus court chemin de Dijkstra.
 
-贪心算法思想：
+Principes de l'algorithme glouton :
 
-1. 针对一组数据，我们定义了**限制值**和**期望值**，希望从中选出几个数据，在满足限制值的情况下，期望值最大。
-2. 当前情况下，每次选择在消耗同等限制值的情况下，对期望值贡献最大的数据；或者说对期望值贡献同等的情况下，消耗的限制值尽量少。
-3. 举几个例子看下贪心算法产生的结果是否是最优的。严格证明贪心算法的正确性是非常复杂的。
+1. Pour un ensemble de données donné, nous définissons une **valeur de contrainte** et une **valeur attendue**, avec pour objectif de sélectionner quelques données parmi celles-ci de manière à maximiser la valeur attendue tout en respectant la valeur de contrainte.
+2. À chaque étape, nous choisissons les données qui, parmi celles disponibles, contribuent le plus à la valeur attendue tout en consommant la même valeur de contrainte ; ou bien, qui contribuent de manière équivalente à la valeur attendue tout en minimisant la consommation de la valeur de contrainte.
+3. Nous examinons quelques exemples pour voir si les résultats produits par l'algorithme glouton sont optimaux. La preuve rigoureuse de la validité de l'algorithme glouton est très complexe.
 
 {% hint style="info" %}
-用贪心算法解决问题的思路，并不总能给出最优解。尤其在前面的选择会影响后面的选择的情况下。
+L'utilisation de l'algorithme glouton pour résoudre un problème ne garantit pas toujours la solution optimale. Cela est particulièrement vrai lorsque les choix effectués initialement peuvent influencer les choix ultérieurs.
 {% endhint %}
 
-## 案例
+## Exemples
 
-* [LeetCode 122：股票买卖最大利益。](https://github.com/StoneYunZhao/algorithm/blob/master/src/main/java/com/zhaoyun/leetcode/greedy/LT122.java)
+* [LeetCode 122 : Meilleur moment pour acheter et vendre des actions](https://github.com/StoneYunZhao/algorithm/blob/master/src/main/java/com/zhaoyun/leetcode/greedy/LT122.java)
 
-### 背包问题
+### Problème du sac à dos
 
-问题：一个背包可以容纳 100kg，有五种豆子，背包中应该装哪些豆子，每种豆子装多少，可以使背包中总价值最大。
+Problème : Un sac à dos peut contenir 100 kg. Il y a cinq types de haricots, lesquels devraient être mis dans le sac à dos et combien de chaque type pour maximiser la valeur totale du sac à dos.
 
-| 物品 | 总量（kg） | 总价值（元） |
+| Produit | Poids total (kg) | Valeur totale (€) |
 | :--- | :--- | :--- |
-| 黄豆 | 100 | 100 |
-| 绿豆 | 30 | 90 |
-| 红豆 | 60 | 120 |
-| 黑豆 | 20 | 80 |
-| 青豆 | 50 | 75 |
-
+| Haricots jaunes | 100 | 100 |
+| Haricots verts | 30 | 90 |
+| Haricots rouges | 60 | 120 |
+| Haricots noirs | 20 | 80 |
+| Haricots bleus | 50 | 75 |

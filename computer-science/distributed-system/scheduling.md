@@ -1,35 +1,34 @@
-# Scheduling
+# Ordonnancement
 
-为任务寻找合适的服务器，叫做调度。
+Trouver un serveur approprié pour une tâche s'appelle l'ordonnancement.
 
-## 单体调度
+## Ordonnancement Monolithique
 
-集群中仅一个节点运行调度进程，调度器同时管理任务和资源，拥有资源和任务的全局视图。
+Dans un cluster, un seul nœud exécute le processus d'ordonnancement. Le planificateur gère à la fois les tâches et les ressources, ayant une vue globale des ressources et des tâches.
 
-调度算法一般包括两个阶段：
+Les algorithmes d'ordonnancement comprennent généralement deux phases :
 
-* 可行性检查，找到多台可以运行任务的机器。
-* 评分，从多台中选择一台。又分为“最差匹配”和“最佳匹配”两种。
+* Vérification de la faisabilité, trouver plusieurs machines pouvant exécuter la tâche.
+* Évaluation, choisir une machine parmi plusieurs. Il existe deux variantes : le "match le pire" et le "match le meilleur".
 
 ![](../../.gitbook/assets/image%20%28282%29.png)
 
-若是有多个集群，则通过**集群联邦**来实现单体调度。集群联邦就是单体调度的分层实现。
+S'il y a plusieurs clusters, le monolithique est implémenté à travers une **fédération de clusters**. La fédération de clusters est une implémentation en couches de l'ordonnancement monolithique.
 
-## 两层调度
+## Ordonnancement à Deux Niveaux
 
-两层调度的第一层是中央调度器，只负责资源的管理和分配；第二层只能获得部分的资源视图，负责任务与资源匹配。
+La première couche de l'ordonnancement à deux niveaux est le planificateur central, responsable uniquement de la gestion et de l'allocation des ressources ; la deuxième couche n'a qu'une vue partielle des ressources et est responsable de l'association des tâches aux ressources.
 
 ![](../../.gitbook/assets/image%20%28283%29.png)
 
-## 共享状态调度
+## Ordonnancement avec État Partagé
 
-有多个调度器，共享集群状态，包括资源状态和任务状态。通过乐观并发调度来解决冲突，而双层调度是悲观的并发调度。
+Il existe plusieurs planificateurs partageant l'état du cluster, comprenant l'état des ressources et des tâches. Les conflits sont résolus par un ordonnancement concurrentiel optimiste, tandis que l'ordonnancement à deux niveaux est pessimiste.
 
 ![](../../.gitbook/assets/image%20%28279%29.png)
 
-## 对比
+## Comparaison
 
 ![](../../.gitbook/assets/image%20%28284%29.png)
 
 ![](../../.gitbook/assets/image%20%28278%29.png)
-

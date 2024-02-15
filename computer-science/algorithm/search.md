@@ -1,31 +1,29 @@
-# Binary Search
+# Recherche binaire
 
-**描述**：二分查找针对有序的数据集合，每次与区间中间元素对比，将待查找区间缩为一半，直到找到或区间被缩小为 0。
+**Description** : La recherche binaire s'applique aux ensembles de données triés. À chaque étape, elle compare l'élément médian de l'intervalle avec l'élément recherché, réduisant ainsi l'intervalle de recherche de moitié jusqu'à ce qu'elle trouve l'élément ou que l'intervalle devienne vide.
 
-![](../../.gitbook/assets/image%20%2849%29.png)
+**Complexité temporelle** : O(log n), où O(log n) est extrêmement efficace, **parfois même plus efficace que le temps constant**.
 
-**时间复杂度**：O\(logn\)，O\(logn\) 极其高效，**有时甚至比常量级更高效**。
+**Points clés du code** :
 
-**代码要点**：
+- Condition de sortie de la boucle : `low <= high`
+- Valeur de mid : `mid = (low + high) / 2` peut causer un débordement, remplacer par `low + ((high - low) >> 1)`
+- `low = mid + 1, high = mid - 1`, au lieu de `low = mid, high = mid`, car cela entraînerait une boucle infinie.
 
-* 循环退出条件：`low <= high`
-* mid取值：`mid = (low + high) / 2`可能造成溢出，改为`low + ((high - low) >> 1)`
-* `low = mid + 1, high = mid - 1`，而不是`low = mid, high = mid`，因为会造成死循环。
+**Limitations** :
 
-**局限性**：
-
-* 依赖顺序表结构，因为需要下标**随机访问**。
-* 需要**有序**数据。若不有序，需要插入、删除不频繁，一次排序多次查找的情况。
-* 数据量小时没必要用二分，直接顺序查找。例外，数据比较耗时，如长度为300的字符串，那么此时就算数据量小也要二分。
-* 数据量大不合适，因为需要连续内存。
+- Dépend de la structure de tableau ordonné car nécessite un **accès aléatoire** par index.
+- Nécessite des données **triées**. Si non trié, utile pour une recherche unique après un tri initial.
+- Pas nécessaire pour une petite quantité de données, une recherche séquentielle est préférable. Exception : si la comparaison des données est coûteuse, comme des chaînes de longueur 300, même pour une petite quantité de données, la recherche binaire est justifiée.
+- Pas adapté pour une grande quantité de données en raison de l'exigence de mémoire continue.
 
 {% hint style="info" %}
-大部分情况，用二分查找解决的问题，都可以用散列表和二叉树解决，但是后者需要额外的内存空间。
+Dans la plupart des cas, les problèmes résolus avec la recherche binaire peuvent également être résolus avec des tables de hachage et des arbres binaires, mais ces derniers nécessitent une mémoire supplémentaire.
 {% endhint %}
 
-二分查找**最简单**情况是有序数组中**不存在重复元素**，当有序数组中存在重复数据时，稍微复杂。二分查找变体：
+La situation la **plus simple** pour la recherche binaire est dans un tableau trié où **les éléments ne sont pas répétés**. Cependant, cela devient légèrement plus complexe lorsque des données répétées sont présentes. Variantes de la recherche binaire :
 
-**查找第一个值等于给定值的元素：**
+**Rechercher le premier élément égal à une valeur donnée :**
 
 ```java
 public static int search(int[] nums, int target) {
@@ -52,17 +50,16 @@ public static int search(int[] nums, int target) {
 }
 ```
 
-**查找最后一个值等于给定值得元素：**
+**Rechercher le dernier élément égal à une valeur donnée :**
 
-**查找第一个大于等于给定值的元素：**
+**Rechercher le premier élément plus grand ou égal à une valeur donnée :**
 
-**查找最后一个小于等于给定值的元素：**
+**Rechercher le dernier élément plus petit ou égal à une valeur donnée :**
 
 {% hint style="info" %}
-对于等值查询，散列表和二叉树都能解决二分查找的问题，但是对于“近似”查询（如上面的四种变体），二分查找的优势就明显了。
+Pour les requêtes d'égalité, les tables de hachage et les arbres binaires peuvent également résoudre le problème de la recherche binaire, mais pour les "requêtes approximatives" (comme les quatre variantes ci-dessus), l'avantage de la recherche binaire est évident.
 {% endhint %}
 
-## 例题
+## Exemples de problèmes
 
-* [LeetCode 69：求平方根。](https://github.com/StoneYunZhao/algorithm/blob/master/src/main/java/com/zhaoyun/leetcode/search/LT69.java)
-
+* [LeetCode 69 : Calcul de la racine carrée.](https://github.com/StoneYunZhao/algorithm/blob/master/src/main/java/com/zhaoyun/leetcode/search/LT69.java)
